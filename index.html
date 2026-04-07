@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PFI Analysis Engine</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #1a1a1a; --bg2: #242424; --bg3: #2e2e2e;
+  --text: #e0e0e0; --text2: #999;
+  --green: #4CAF50; --yellow: #FFC107; --red: #F44336;
+  --blue: #2196F3; --accent: #00BCD4;
+}
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; user-select: none; }
+
+/* Layout — fixed panels, no reflow on analysis */
+#app { display: flex; flex-direction: column; height: 100vh; }
+#viewer-row { display: flex; flex: 1; min-height: 0; }
+#sag-panel { flex: 0 0 60%; position: relative; background: #000; overflow: hidden; border-right: 1px solid #333; }
+#ax-panel { flex: 0 0 40%; position: relative; background: #000; overflow: hidden; }
+
+/* Viewer images — fill panel, maintain aspect ratio */
+.viewer-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: auto; transition: filter 0.05s; }
+.panel-label { position: absolute; top: 10px; left: 12px; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 600; letter-spacing: 0.5px; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
+.slice-counter { position: absolute; top: 10px; right: 12px; font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; font-variant-numeric: tabular-nums; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
+.no-data-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #555; font-size: 14px; }
+
+/* Study selector bar */
+#study-bar { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg2); border-top: 1px solid #333; flex-shrink: 0; }
+#study-bar .bar-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-right: 8px; white-space: nowrap; }
+.study-btn { padding: 7px 16px; border: 1px solid #444; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.study-btn:hover { border-color: var(--accent); color: #fff; }
+.study-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.study-btn .conf-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+
+/* Loading bar */
+#load-bar-container { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(0,0,0,0.5); z-index: 20; display: none; }
+#load-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s; }
+
+/* PFI Overlay — fixed position, never affects layout */
+#pfi-overlay { position: fixed; bottom: 56px; left: 16px; width: 320px; background: rgba(26,26,26,0.95); border: 1px solid #444; border-radius: 12px; z-index: 50; backdrop-filter: blur(8px); overflow: hidden; transition: max-height 0.3s ease; max-height: 500px; }
+#pfi-overlay.collapsed { max-height: 42px; }
+#pfi-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #333; }
+#pfi-header h3 { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; }
+#pfi-header .chevron { color: var(--text2); font-size: 12px; transition: transform 0.2s; }
+#pfi-overlay.collapsed .chevron { transform: rotate(-90deg); }
+#pfi-body { padding: 14px 16px; }
+
+/* Analyze button */
+#analyze-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+#analyze-btn:hover { background: #00a5b5; }
+#analyze-btn:disabled { background: #444; color: #888; cursor: default; }
+#analyze-btn .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+#analyze-btn.loading .spinner { display: inline-block; }
+#analyze-btn.loading .btn-text { display: none; }
+#analyze-btn.loading .btn-loading-text { display: inline; }
+#analyze-btn .btn-loading-text { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Results */
+#results-panel { display: none; margin-top: 14px; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.result-label { font-size: 12px; color: var(--text2); }
+.result-value { font-size: 13px; font-weight: 600; }
+.result-cat { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.cat-normal { background: rgba(76,175,80,0.15); color: var(--green); }
+.cat-borderline { background: rgba(255,193,7,0.15); color: var(--yellow); }
+.cat-abnormal { background: rgba(244,67,54,0.15); color: var(--red); }
+.divider { height: 1px; background: #333; margin: 10px 0; }
+.conclusion-text { font-size: 18px; font-weight: 700; margin: 4px 0; }
+.confidence-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+.confidence-dot { width: 8px; height: 8px; border-radius: 50%; }
+.confidence-label { font-size: 12px; color: var(--text2); }
+.note-text { font-size: 11px; color: var(--text2); margin-top: 6px; line-height: 1.4; font-style: italic; }
+
+/* Action buttons row */
+.action-row { display: flex; gap: 6px; margin-top: 12px; }
+.action-btn { flex: 1; padding: 7px 10px; border: 1px solid #444; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: 11px; cursor: pointer; text-align: center; transition: all 0.15s; }
+.action-btn:hover { border-color: var(--accent); }
+.action-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.action-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* Viewer wrapper — full panel fill */
+.viewer-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="viewer-row">
+    <div id="sag-panel">
+      <div class="panel-label">SAG</div>
+      <div class="slice-counter" id="sag-counter">-</div>
+      <div class="viewer-wrapper" id="sag-wrapper">
+        <img class="viewer-img" id="sag-img" alt="">
+        <span class="no-data-msg" id="sag-placeholder">Select a study</span>
+      </div>
+      <div id="load-bar-container"><div id="load-bar"></div></div>
+    </div>
+    <div id="ax-panel">
+      <div class="panel-label">AX</div>
+      <div class="slice-counter" id="ax-counter">-</div>
+      <div class="viewer-wrapper" id="ax-wrapper">
+        <img class="viewer-img" id="ax-img" alt="">
+        <span class="no-data-msg" id="ax-placeholder">-</span>
+      </div>
+    </div>
+  </div>
+  <div id="study-bar">
+    <span class="bar-label">Study</span>
+    <div id="study-buttons"></div>
+  </div>
+</div>
+<div id="pfi-overlay">
+  <div id="pfi-header" onclick="toggleOverlay()">
+    <h3>PFI Analysis Engine v1.0</h3>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div id="pfi-body">
+    <button id="analyze-btn" onclick="runAnalysis()" disabled>
+      <span class="spinner"></span>
+      <span class="btn-text">Analyze</span>
+      <span class="btn-loading-text">Analyzing...</span>
+    </button>
+    <div id="results-panel"></div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://mxbtvxbgeyuzffmutauy.supabase.co/storage/v1/object/public/images/pfi-demo';
+
+// State
+let manifest = null;
+let currentCase = null;
+let caseData = {};   // case_name -> { results, sagImgs[], axImgs[], annotatedImg }
+let sagIdx = 0, axIdx = 0;
+let showingAnnotated = false;
+
+// Window/level state
+let wlActive = false, wlStartX = 0, wlStartY = 0;
+let brightness = 100, contrast = 100;
+// Pan state
+let panActive = false, panStartX = 0, panStartY = 0;
+let panX = 0, panY = 0, panBaseX = 0, panBaseY = 0;
+// Zoom
+let zoom = 1;
+
+const CASE_LABELS = {
+  case_normal: 'Normal',
+  case_alta: 'Alta',
+  case_discordant: 'Discordant',
+  case_borderline: 'Borderline',
+  case_baja: 'Baja'
+};
+
+// Init
+async function init() {
+  const resp = await fetch(`${BASE}/manifest.json`);
+  manifest = await resp.json();
+  buildStudyBar();
+  setupViewerEvents();
+  // Auto-select first
+  selectCase(manifest.cases[0].case_name);
+}
+
+function buildStudyBar() {
+  const container = document.getElementById('study-buttons');
+  container.style.display = 'flex';
+  container.style.gap = '6px';
+  manifest.cases.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'study-btn';
+    btn.dataset.case = c.case_name;
+    const confColor = c.confidence === 'High' ? 'var(--green)' : c.confidence === 'Moderate' ? 'var(--yellow)' : 'var(--red)';
+    btn.innerHTML = `${CASE_LABELS[c.case_name]}<span class="conf-dot" style="background:${confColor}"></span>`;
+    btn.title = c.description;
+    btn.onclick = () => selectCase(c.case_name);
+    container.appendChild(btn);
+  });
+}
+
+async function selectCase(caseName) {
+  if (currentCase === caseName) return;
+  currentCase = caseName;
+  showingAnnotated = false;
+
+  // Update buttons
+  document.querySelectorAll('.study-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.case === caseName);
+  });
+
+  // Reset analysis
+  document.getElementById('results-panel').style.display = 'none';
+  document.getElementById('results-panel').innerHTML = '';
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.remove('loading');
+  btn.disabled = true;
+  btn.querySelector('.btn-text').textContent = 'Analyze';
+
+  // Reset view
+  brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
+  applyTransform('sag'); applyTransform('ax');
+
+  // Load data if not cached
+  if (!caseData[caseName]) {
+    await loadCaseData(caseName);
+  }
+
+  const data = caseData[caseName];
+  sagIdx = data.results.best_slice_index;
+  axIdx = Math.floor((data.axImgs.length || 1) / 2);
+  showSlice('sag');
+  showSlice('ax');
+  btn.disabled = false;
+}
+
+async function loadCaseData(caseName) {
+  const info = manifest.cases.find(c => c.case_name === caseName);
+  const loadBar = document.getElementById('load-bar-container');
+  const bar = document.getElementById('load-bar');
+  loadBar.style.display = 'block';
+  bar.style.width = '0%';
+
+  // Load results.json
+  const res = await fetch(`${BASE}/${caseName}/results.json`);
+  const results = await res.json();
+
+  // Load annotated
+  const annotatedImg = new Image();
+  const annotatedPromise = new Promise(resolve => {
+    annotatedImg.onload = resolve;
+    annotatedImg.onerror = resolve;
+    annotatedImg.src = `${BASE}/${caseName}/annotated.png`;
+  });
+
+  // Preload SAG slices
+  const nSag = info.n_slices_sag;
+  const nAx = info.n_slices_ax;
+  const total = nSag + nAx + 1;
+  let loaded = 0;
+
+  function tick() {
+    loaded++;
+    bar.style.width = `${(loaded / total) * 100}%`;
+  }
+
+  const sagImgs = [];
+  const sagPromises = [];
+  for (let i = 1; i <= nSag; i++) {
+    const img = new Image();
+    const p = new Promise(resolve => {
+      img.onload = () => { tick(); resolve(); };
+      img.onerror = () => { tick(); resolve(); };
+    });
+    img.src = `${BASE}/${caseName}/sag/${String(i).padStart(3, '0')}.png`;
+    sagImgs.push(img);
+    sagPromises.push(p);
+  }
+
+  const axImgs = [];
+  const axPromises = [];
+  for (let i = 1; i <= nAx; i++) {
+    const img = new Image();
+    const p = new Promise(resolve => {
+      img.onload = () => { tick(); resolve(); };
+      img.onerror = () => { tick(); resolve(); };
+    });
+    img.src = `${BASE}/${caseName}/ax/${String(i).padStart(3, '0')}.png`;
+    axImgs.push(img);
+    axPromises.push(p);
+  }
+
+  await Promise.all([...sagPromises, ...axPromises, annotatedPromise]);
+  tick();
+
+  caseData[caseName] = { results, sagImgs, axImgs, annotatedImg };
+
+  bar.style.width = '100%';
+  setTimeout(() => { loadBar.style.display = 'none'; }, 300);
+}
+
+function showSlice(panel) {
+  const data = caseData[currentCase];
+  if (!data) return;
+
+  if (panel === 'sag') {
+    const img = document.getElementById('sag-img');
+    const placeholder = document.getElementById('sag-placeholder');
+    if (showingAnnotated) {
+      img.src = data.annotatedImg.src;
+      document.getElementById('sag-counter').textContent = `BEST (${data.results.best_slice_index + 1}/${data.sagImgs.length})`;
+    } else if (data.sagImgs.length > 0) {
+      const idx = Math.max(0, Math.min(sagIdx, data.sagImgs.length - 1));
+      sagIdx = idx;
+      img.src = data.sagImgs[idx].src;
+      document.getElementById('sag-counter').textContent = `${idx + 1} / ${data.sagImgs.length}`;
+    }
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+    applyTransform('sag');
+  } else {
+    const img = document.getElementById('ax-img');
+    const placeholder = document.getElementById('ax-placeholder');
+    if (data.axImgs.length > 0) {
+      const idx = Math.max(0, Math.min(axIdx, data.axImgs.length - 1));
+      axIdx = idx;
+      img.src = data.axImgs[idx].src;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      document.getElementById('ax-counter').textContent = `${idx + 1} / ${data.axImgs.length}`;
+    } else {
+      img.style.display = 'none';
+      placeholder.style.display = 'block';
+      placeholder.textContent = 'No AX series';
+      document.getElementById('ax-counter').textContent = '-';
+    }
+    applyTransform('ax');
+  }
+}
+
+function applyTransform(panel) {
+  const img = document.getElementById(`${panel}-img`);
+  img.style.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
+  img.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
+}
+
+// Viewer events
+function setupViewerEvents() {
+  ['sag-panel', 'ax-panel'].forEach(panelId => {
+    const panel = document.getElementById(panelId);
+    const isSag = panelId === 'sag-panel';
+
+    // Scroll = change slice
+    panel.addEventListener('wheel', e => {
+      if (!currentCase || !caseData[currentCase]) return;
+      e.preventDefault();
+      if (e.ctrlKey) {
+        // Zoom
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        zoom = Math.max(0.5, Math.min(5, zoom + delta));
+        applyTransform('sag'); applyTransform('ax');
+        return;
+      }
+      const dir = e.deltaY > 0 ? 1 : -1;
+      if (isSag) {
+        if (showingAnnotated) return;
+        sagIdx += dir;
+        showSlice('sag');
+      } else {
+        axIdx += dir;
+        showSlice('ax');
+      }
+    }, { passive: false });
+
+    // Middle button drag = W/L
+    panel.addEventListener('mousedown', e => {
+      if (e.button === 1) {
+        e.preventDefault();
+        wlActive = true;
+        wlStartX = e.clientX;
+        wlStartY = e.clientY;
+      } else if (e.button === 2) {
+        e.preventDefault();
+        panActive = true;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        panBaseX = panX;
+        panBaseY = panY;
+      }
+    });
+
+    panel.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (wlActive) {
+      const dx = e.clientX - wlStartX;
+      const dy = e.clientY - wlStartY;
+      brightness = Math.max(20, Math.min(300, 100 + dy * -0.5));
+      contrast = Math.max(20, Math.min(300, 100 + dx * 0.5));
+      applyTransform('sag'); applyTransform('ax');
+    }
+    if (panActive) {
+      panX = panBaseX + (e.clientX - panStartX) / zoom;
+      panY = panBaseY + (e.clientY - panStartY) / zoom;
+      applyTransform('sag'); applyTransform('ax');
+    }
+  });
+
+  document.addEventListener('mouseup', e => {
+    if (e.button === 1) wlActive = false;
+    if (e.button === 2) panActive = false;
+  });
+
+  // Reset on double click
+  document.getElementById('sag-panel').addEventListener('dblclick', () => {
+    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
+    applyTransform('sag'); applyTransform('ax');
+  });
+  document.getElementById('ax-panel').addEventListener('dblclick', () => {
+    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
+    applyTransform('sag'); applyTransform('ax');
+  });
+}
+
+// PFI Overlay
+function toggleOverlay() {
+  document.getElementById('pfi-overlay').classList.toggle('collapsed');
+}
+
+async function runAnalysis() {
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Simulated delay
+  await new Promise(r => setTimeout(r, 1500 + Math.random() * 500));
+
+  const data = caseData[currentCase];
+  const r = data.results;
+  showResults(r);
+
+  btn.classList.remove('loading');
+  btn.querySelector('.btn-text').textContent = 'Re-analyze';
+  btn.disabled = false;
+}
+
+function catClass(cat) {
+  if (cat === 'Normal') return 'cat-normal';
+  if (cat.includes('Borderline')) return 'cat-borderline';
+  return 'cat-abnormal';
+}
+
+function confColor(conf) {
+  if (conf === 'High') return 'var(--green)';
+  if (conf === 'Moderate') return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function conclusionColor(c) {
+  if (c === 'Normal') return 'var(--green)';
+  if (c === 'Inconclusive') return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function showResults(r) {
+  const panel = document.getElementById('results-panel');
+  panel.innerHTML = `
+    <div class="result-row">
+      <span class="result-label">Insall-Salvati</span>
+      <span><span class="result-value">${r.is_value.toFixed(3)}</span> <span class="result-cat ${catClass(r.is_5cat)}">${r.is_5cat}</span></span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Caton-Deschamps</span>
+      <span><span class="result-value">${r.cdi_value.toFixed(3)}</span> <span class="result-cat ${catClass(r.cdi_5cat)}">${r.cdi_5cat}</span></span>
+    </div>
+    <div class="divider"></div>
+    <div class="conclusion-text" style="color:${conclusionColor(r.conclusion)}">${r.conclusion}</div>
+    <div class="confidence-row">
+      <span class="confidence-dot" style="background:${confColor(r.confidence)}"></span>
+      <span class="confidence-label">Confidence: <strong style="color:${confColor(r.confidence)}">${r.confidence}</strong></span>
+    </div>
+    <div class="note-text">${r.note}</div>
+    <div class="action-row">
+      <button class="action-btn" id="landmark-btn" onclick="toggleLandmarks()">Show Landmarks</button>
+      <button class="action-btn" id="copy-btn" onclick="copyReport()">Copy Report</button>
+    </div>
+  `;
+  panel.style.display = 'block';
+}
+
+function toggleLandmarks() {
+  showingAnnotated = !showingAnnotated;
+  const btn = document.getElementById('landmark-btn');
+  btn.classList.toggle('active', showingAnnotated);
+  btn.textContent = showingAnnotated ? 'Hide Landmarks' : 'Show Landmarks';
+  if (showingAnnotated) {
+    sagIdx = caseData[currentCase].results.best_slice_index;
+  }
+  showSlice('sag');
+}
+
+function copyReport() {
+  const r = caseData[currentCase].results;
+  const text = `PATELLOFEMORAL INDICES (automated):
+Insall-Salvati index: ${r.is_value.toFixed(3)} (${r.is_5cat})
+Caton-Deschamps index: ${r.cdi_value.toFixed(3)} (${r.cdi_5cat})
+
+Patellar height: ${r.conclusion}
+Confidence: ${r.confidence}
+Note: ${r.note}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = 'Copy Report';
+    }, 1500);
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (!currentCase || !caseData[currentCase]) return;
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    if (!showingAnnotated) { sagIdx--; showSlice('sag'); }
+  } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    if (!showingAnnotated) { sagIdx++; showSlice('sag'); }
+  } else if (e.key === 'r' || e.key === 'R') {
+    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
+    applyTransform('sag'); applyTransform('ax');
+  } else if (e.key >= '1' && e.key <= '5') {
+    const idx = parseInt(e.key) - 1;
+    if (manifest && manifest.cases[idx]) {
+      selectCase(manifest.cases[idx].case_name);
+    }
+  }
+});
+
+init();
+</script>
+</body>
+</html>
