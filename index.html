@@ -421,6 +421,13 @@ async function runAnalysis() {
   const r = data.results;
   showResults(r);
 
+  // Auto-show landmarks after analysis
+  if (!showingAnnotated) {
+    showingAnnotated = true;
+    sagIdx = data.results.best_slice_index;
+    showSlice('sag');
+  }
+
   btn.classList.remove('loading');
   btn.querySelector('.btn-text').textContent = 'Re-analyze';
   btn.disabled = false;
@@ -463,7 +470,7 @@ function showResults(r) {
     </div>
     <div class="note-text">${r.note}</div>
     <div class="action-row">
-      <button class="action-btn" id="landmark-btn" onclick="toggleLandmarks()">Show Landmarks</button>
+      <button class="action-btn active" id="landmark-btn" onclick="toggleLandmarks()">Hide Landmarks</button>
       <button class="action-btn" id="copy-btn" onclick="copyReport()">Copy Report</button>
     </div>
   `;
