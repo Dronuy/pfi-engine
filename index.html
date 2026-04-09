@@ -462,6 +462,10 @@ function showResults(r) {
       <span class="result-label">Caton-Deschamps</span>
       <span><span class="result-value">${r.cdi_value.toFixed(3)}</span> <span class="result-cat ${catClass(r.cdi_5cat)}">${r.cdi_5cat}</span></span>
     </div>
+    <div class="result-row">
+      <span class="result-label">Patellar Tracking</span>
+      <span><span class="result-value">${(r.pti_value||0).toFixed(3)}</span> <span class="result-cat ${catClass(r.pti_3cat||'Normal')}">${r.pti_3cat||'—'}</span></span>
+    </div>
     <div class="divider"></div>
     <div class="conclusion-text" style="color:${conclusionColor(r.conclusion)}">${r.conclusion}</div>
     <div class="confidence-row">
@@ -493,6 +497,7 @@ function copyReport() {
   const text = `PATELLOFEMORAL INDICES (automated):
 Insall-Salvati index: ${r.is_value.toFixed(3)} (${r.is_5cat})
 Caton-Deschamps index: ${r.cdi_value.toFixed(3)} (${r.cdi_5cat})
+Patellar Tracking Index: ${(r.pti_value||0).toFixed(3)} (${r.pti_3cat||'—'})
 
 Patellar height: ${r.conclusion}
 Confidence: ${r.confidence}
