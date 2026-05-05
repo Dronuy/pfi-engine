@@ -527,17 +527,42 @@ function drawAxOverlay() {
     }
   }
 
-  // TT slice: TT_anterior + projected reference
+  // TT slice: TT_anterior + perpendicular-to-PCL projection lines (Hinckel 2015/2017)
   if (cur === slices.tt) {
-    const tt = ax.tt_landmarks_512px || {};
-    if (tt.TT_anterior) {
+    const tt   = ax.tt_landmarks_512px   || {};
+    const meas = ax.meas_landmarks_512px || {};
+    if (tt.TT_anterior && meas.Sulcus && pcl.PCL_med && pcl.PCL_lat) {
+      // PCL unit vector (image-space approximation; adequate for 2D viewer
+      // because IPP cancels for in-plane PCL axis on PT-TG geometry).
+      const dx = pcl.PCL_lat[0] - pcl.PCL_med[0];
+      const dy = pcl.PCL_lat[1] - pcl.PCL_med[1];
+      const L  = Math.hypot(dx, dy);
+      const ux = dx / L, uy = dy / L;        // along PCL
+      const nx = -uy,    ny = ux;            // perpendicular to PCL (90° CCW)
+      // 1. Projected PCL line (dashed white reference).
+      drawLine(svg, pcl.PCL_med, pcl.PCL_lat, 'var(--ovly-white)', 1, true);
+      // 2. Perpendicular dropped from TG (Sulcus) to PCL — extend ±220 px through TG.
+      const tg = meas.Sulcus, ext = 220;
+      drawLine(svg,
+        [tg[0] - nx*ext, tg[1] - ny*ext],
+        [tg[0] + nx*ext, tg[1] + ny*ext],
+        'var(--ovly-cyan)', 1, true);
+      drawDot(svg, tg, 'var(--ovly-cyan)', 5);
+      // 3. Perpendicular dropped from TT to PCL.
+      drawLine(svg,
+        [tt.TT_anterior[0] - nx*ext, tt.TT_anterior[1] - ny*ext],
+        [tt.TT_anterior[0] + nx*ext, tt.TT_anterior[1] + ny*ext],
+        'var(--ovly-yellow)', 1, true);
       drawDot(svg, tt.TT_anterior, 'var(--ovly-yellow)', 6);
-      const meas = ax.meas_landmarks_512px || {};
-      if (meas.Sulcus) {
-        // Project Sulcus_cart vertical line as TG reference
-        drawLine(svg, [meas.Sulcus[0], 20], [meas.Sulcus[0], 492], 'var(--ovly-cyan)', 1, true);
-      }
-      drawLine(svg, [tt.TT_anterior[0], 20], [tt.TT_anterior[0], 492], 'var(--ovly-yellow)', 1, true);
+      // 4. Foot points on PCL line (parameter t along PCL from PCL_med).
+      const t_tg = (tg[0]-pcl.PCL_med[0])*ux + (tg[1]-pcl.PCL_med[1])*uy;
+      const t_tt = (tt.TT_anterior[0]-pcl.PCL_med[0])*ux + (tt.TT_anterior[1]-pcl.PCL_med[1])*uy;
+      const foot_tg = [pcl.PCL_med[0] + t_tg*ux, pcl.PCL_med[1] + t_tg*uy];
+      const foot_tt = [pcl.PCL_med[0] + t_tt*ux, pcl.PCL_med[1] + t_tt*uy];
+      // 5. Green segment between feet on PCL — THIS is the PT-TG measurement.
+      drawLine(svg, foot_tg, foot_tt, 'var(--ovly-green)', 2.5);
+      drawDot(svg, foot_tg, 'var(--ovly-cyan)', 4);
+      drawDot(svg, foot_tt, 'var(--ovly-yellow)', 4);
       const pttg = ax.indices?.PT_TG_cart;
       drawTextLabel(svg, tt.TT_anterior, 8, -10,
           `PT-TG = ${fmt(pttg?.value, 1)} mm ${pttg?.verdict}`, verdictHex(pttg?.verdict));
