@@ -11,138 +11,188 @@
   --text: #e0e0e0; --text2: #999; --text3: #666;
   --green: #4CAF50; --yellow: #FFC107; --orange: #FF9800; --red: #F44336;
   --blue: #2196F3; --accent: #00BCD4;
+  --ovly-cyan: #00FFFF; --ovly-yellow: #FFD700; --ovly-red: #FF4040;
+  --ovly-orange: #FFA500; --ovly-green: #00FF7F; --ovly-white: #FFFFFF;
   --border: #3a3a3a;
 }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; line-height: 1.5; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; line-height: 1.45; }
 
-/* ── Top bar ─────────────────────────────────────────────────────────── */
-header { background: var(--bg2); padding: 16px 24px; border-bottom: 1px solid var(--border); }
-header h1 { font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; }
-header .tagline { font-size: 13px; color: var(--text2); margin-top: 3px; }
-header .disclaimer { display: inline-block; margin-top: 8px; padding: 4px 10px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); color: #ff8a80; font-size: 11px; border-radius: 4px; letter-spacing: 0.3px; }
+header { background: var(--bg2); padding: 12px 20px; border-bottom: 1px solid var(--border); }
+header h1 { font-size: 16px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; }
+header .tagline { font-size: 12px; color: var(--text2); margin-top: 2px; }
+header .disclaimer { display: inline-block; margin-top: 6px; padding: 3px 9px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); color: #ff8a80; font-size: 10px; border-radius: 4px; letter-spacing: 0.3px; }
 
-/* ── Layout grid ─────────────────────────────────────────────────────── */
-main { max-width: 1280px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
-@media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 16px; gap: 16px; } }
+main { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
 
-/* ── Case selector (left rail) ───────────────────────────────────────── */
-#cases { display: flex; flex-direction: column; gap: 10px; }
-@media (max-width: 900px) { #cases { flex-direction: row; overflow-x: auto; padding-bottom: 8px; } }
-.case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.15s; flex-shrink: 0; min-width: 200px; }
+/* Cases bar */
+#cases { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: all 0.15s; flex: 0 1 auto; min-width: 140px; }
 .case-card:hover { border-color: var(--accent); }
 .case-card.active { border-color: var(--accent); background: var(--bg3); }
-.case-card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.case-card .headline { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-.case-card .summary { font-size: 12px; color: var(--text2); line-height: 1.4; }
-.case-card .badge { display: inline-block; margin-top: 8px; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; }
+.case-card .label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+.case-card .headline { font-size: 13px; font-weight: 600; color: var(--text); margin: 2px 0 4px; }
+.case-card .badge { display: inline-block; padding: 1px 7px; font-size: 10px; font-weight: 600; border-radius: 2px; }
 
-/* ── Main view ───────────────────────────────────────────────────────── */
-#main-view { min-width: 0; }
-#welcome { background: var(--bg2); padding: 24px; border-radius: 8px; border: 1px solid var(--border); }
-#welcome h2 { font-size: 16px; margin-bottom: 12px; color: var(--accent); }
-#welcome p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
-.placeholder-link { color: var(--text3); font-style: italic; font-size: 12px; }
+/* Viewers */
+#viewers-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+@media (max-width: 1000px) { #viewers-row { grid-template-columns: 1fr; } }
 
-#case-view { display: none; }
-.composite-card { background: var(--bg2); border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
-.composite-card .composite-headline { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; }
-.composite-card .composite-badge { display: inline-block; margin-top: 8px; padding: 8px 18px; font-size: 18px; font-weight: 700; border-radius: 6px; letter-spacing: 0.5px; }
-.composite-card .composite-rec { margin-top: 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
+.viewer-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.viewer-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); font-size: 12px; }
+.viewer-header .vlbl { color: var(--accent); font-weight: 600; letter-spacing: 0.5px; }
+.viewer-header .ax-jumps { display: flex; gap: 4px; }
+.viewer-header .ax-jumps button { padding: 3px 8px; border: 1px solid var(--border); border-radius: 3px; background: var(--bg2); color: var(--text2); font-size: 10px; cursor: pointer; transition: all 0.15s; }
+.viewer-header .ax-jumps button:hover { border-color: var(--accent); color: var(--text); }
+.viewer-header .ax-jumps button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* ── Domain panels (accordion) ──────────────────────────────────────── */
-.domain-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-.domain-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; transition: background 0.15s; }
-.domain-header:hover { background: var(--bg3); }
-.domain-header h3 { font-size: 15px; font-weight: 600; }
-.domain-header .right { display: flex; align-items: center; gap: 12px; }
-.domain-header .domain-verdict { font-size: 12px; padding: 3px 10px; border-radius: 3px; font-weight: 600; }
-.domain-header .chevron { color: var(--text2); font-size: 11px; transition: transform 0.2s; }
+.viewer-canvas { position: relative; aspect-ratio: 1/1; background: #000; user-select: none; }
+.viewer-canvas img.slice-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: auto; }
+.viewer-canvas svg.overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.viewer-canvas .panel-tag { position: absolute; top: 6px; left: 8px; font-size: 11px; color: rgba(255,255,255,0.6); pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.viewer-canvas .slice-counter { position: absolute; top: 6px; right: 8px; font-size: 11px; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.viewer-canvas .best-slice-marker { position: absolute; bottom: 6px; left: 8px; font-size: 10px; color: var(--accent); pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+.viewer-scrubber { display: flex; align-items: center; padding: 6px 10px; background: var(--bg3); gap: 8px; }
+.viewer-scrubber button { padding: 3px 8px; background: var(--bg2); border: 1px solid var(--border); color: var(--text); border-radius: 3px; cursor: pointer; font-size: 12px; }
+.viewer-scrubber button:hover { border-color: var(--accent); }
+.viewer-scrubber input[type=range] { flex: 1; }
+.viewer-scrubber .idx { font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; min-width: 60px; text-align: center; }
+
+/* Analyze button */
+#analyze-row { display: flex; justify-content: center; margin: 14px 0 18px; }
+#analyze-btn { padding: 14px 36px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+#analyze-btn:hover { background: #00a5b5; }
+#analyze-btn:disabled { background: #444; color: #888; cursor: default; }
+#analyze-btn.analyzed { background: var(--green); }
+
+/* Results panel */
+#results { display: none; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+#results.show { display: block; animation: fade 0.3s; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.composite-card { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.composite-card .composite-headline { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.2px; }
+.composite-card .composite-badge { padding: 8px 18px; font-size: 16px; font-weight: 700; border-radius: 5px; letter-spacing: 0.5px; }
+.composite-card .composite-rec { flex: 1; font-size: 12px; color: var(--text); }
+
+.domain-panel { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+.domain-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; user-select: none; transition: background 0.15s; background: var(--bg3); }
+.domain-header:hover { background: var(--bg4); }
+.domain-header h3 { font-size: 13px; font-weight: 600; }
+.domain-header .right { display: flex; align-items: center; gap: 10px; }
+.domain-header .domain-verdict { font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: 600; }
+.domain-header .chevron { color: var(--text2); font-size: 10px; transition: transform 0.2s; }
 .domain-panel.expanded .chevron { transform: rotate(180deg); }
-.domain-body { display: none; padding: 12px 18px 18px; border-top: 1px solid var(--border); background: var(--bg); }
+.domain-body { display: none; padding: 10px 14px 14px; border-top: 1px solid var(--border); }
 .domain-panel.expanded .domain-body { display: block; }
 
-/* ── Index cards ─────────────────────────────────────────────────────── */
-.index-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
-.index-card .row1 { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.index-card .name { font-size: 13px; font-weight: 600; }
-.index-card .ref { font-size: 10px; color: var(--text3); margin-top: 2px; letter-spacing: 0.3px; }
-.index-card .right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.index-card .value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.index-card .verdict { font-size: 11px; padding: 3px 9px; border-radius: 3px; font-weight: 600; letter-spacing: 0.3px; }
-.index-card .threshold { font-size: 11px; color: var(--text2); margin-top: 6px; }
+.idx-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; }
+.idx-card .name { font-weight: 600; }
+.idx-card .ref { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.idx-card .right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.idx-card .value { font-weight: 700; font-variant-numeric: tabular-nums; }
+.idx-card .verdict { padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 10px; }
 
-/* Verdict colours */
 .v-normal     { background: rgba(76,175,80,0.15);  color: var(--green); }
 .v-borderline { background: rgba(255,193,7,0.15);  color: var(--yellow); }
 .v-abnormal   { background: rgba(244,67,54,0.15);  color: var(--red); }
 .v-info       { background: rgba(33,150,243,0.15); color: var(--blue); }
-
-/* Composite phenotype colours */
 .comp-Normal   { background: rgba(76,175,80,0.18);  color: var(--green);  border: 1px solid rgba(76,175,80,0.35); }
 .comp-Mild     { background: rgba(255,193,7,0.18);  color: var(--yellow); border: 1px solid rgba(255,193,7,0.35); }
 .comp-Moderate { background: rgba(255,152,0,0.18);  color: var(--orange); border: 1px solid rgba(255,152,0,0.35); }
 .comp-Severe   { background: rgba(244,67,54,0.18);  color: var(--red);    border: 1px solid rgba(244,67,54,0.35); }
 
-/* ── Discordance flags section ───────────────────────────────────────── */
-.flags-section { background: var(--bg2); border: 1px solid rgba(33,150,243,0.35); border-radius: 8px; padding: 16px; margin-top: 16px; }
-.flags-section h3 { font-size: 14px; color: var(--blue); margin-bottom: 10px; }
-.flag-card { background: rgba(33,150,243,0.08); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 4px; margin-bottom: 8px; }
-.flag-card .flag-title { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
-.flag-card .flag-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+.flags-section { background: rgba(33,150,243,0.07); border: 1px solid rgba(33,150,243,0.35); border-radius: 6px; padding: 12px 14px; margin-top: 12px; }
+.flags-section h3 { font-size: 13px; color: var(--blue); margin-bottom: 8px; }
+.flag-card { background: rgba(33,150,243,0.05); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 3px; margin-bottom: 6px; }
+.flag-card .flag-title { font-size: 12px; font-weight: 600; color: var(--blue); margin-bottom: 3px; }
+.flag-card .flag-text { font-size: 11px; color: var(--text); line-height: 1.45; }
 
-/* ── Internal verification (de-emphasized) ──────────────────────────── */
-.internal-section { margin-top: 16px; padding: 12px 16px; background: var(--bg2); border: 1px dashed var(--text3); border-radius: 6px; }
-.internal-section h3 { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
-.internal-section .label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-style: italic; }
-.internal-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.internal-section { margin-top: 12px; padding: 10px 14px; background: var(--bg); border: 1px dashed var(--text3); border-radius: 4px; }
+.internal-section h3 { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 6px; }
+.internal-section .label { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-style: italic; }
+.internal-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 11px; }
 .internal-row .iname { color: var(--text2); }
-.internal-row .ival { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 500; }
+.internal-row .ival { color: var(--text); font-variant-numeric: tabular-nums; }
 
-/* ── Generate report button + modal ────────────────────────────────── */
-#report-btn { width: 100%; padding: 12px; margin-top: 16px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-#report-btn:hover { background: #00a5b5; }
+#report-btn { width: 100%; padding: 10px; margin-top: 12px; border: none; border-radius: 6px; background: var(--bg3); border: 1px solid var(--accent); color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+#report-btn:hover { background: var(--accent); color: #fff; }
 
-#modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+#modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
 #modal-bg.show { display: flex; }
 .modal-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; max-width: 720px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
-.modal-header h3 { font-size: 15px; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.modal-header h3 { font-size: 14px; }
 .modal-header .close { cursor: pointer; color: var(--text2); font-size: 22px; padding: 4px 10px; border-radius: 4px; }
-.modal-header .close:hover { background: var(--bg3); color: var(--text); }
-.modal-body { padding: 18px; overflow-y: auto; }
-.modal-body pre { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--text); white-space: pre-wrap; word-break: break-all; }
-.modal-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
-.btn-secondary { padding: 8px 16px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg3); color: var(--text); font-size: 12px; cursor: pointer; }
+.modal-body { padding: 16px; overflow-y: auto; }
+.modal-body pre { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; color: var(--text); white-space: pre-wrap; word-break: break-all; }
+.modal-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.btn-secondary { padding: 7px 14px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg3); color: var(--text); font-size: 11px; cursor: pointer; }
 .btn-secondary:hover { border-color: var(--accent); }
 .btn-secondary.copied { background: var(--green); border-color: var(--green); color: #fff; }
 
-/* ── Footer ──────────────────────────────────────────────────────────── */
-footer { padding: 24px; text-align: center; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border); margin-top: 32px; }
+footer { padding: 18px; text-align: center; color: var(--text3); font-size: 10px; border-top: 1px solid var(--border); margin-top: 24px; }
 footer a { color: var(--text2); }
-.cite-list { margin-top: 12px; font-size: 10px; color: var(--text3); }
-.cite-list ul { list-style: none; padding: 0; }
-.cite-list li { padding: 2px 0; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1 id="title">PFI Engine — Patellofemoral Instability Assessment</h1>
-  <div class="tagline" id="tagline">…</div>
-  <span class="disclaimer" id="disclaimer">…</span>
+  <h1>PFI Engine — Patellofemoral Instability Assessment</h1>
+  <div class="tagline">Automated quantitative assessment of patellofemoral instability from knee MRI.</div>
+  <span class="disclaimer">FOR RESEARCH USE ONLY · Not for clinical diagnosis · Not FDA-cleared, not CE-marked</span>
 </header>
 
 <main>
-  <aside id="cases"></aside>
+  <div id="cases"></div>
 
-  <section id="main-view">
-    <div id="welcome">
-      <h2>About this demo</h2>
-      <p id="about">…</p>
-      <p class="placeholder-link" id="methodology">…</p>
+  <div id="viewers-row">
+    <div class="viewer-panel" id="sag-panel">
+      <div class="viewer-header">
+        <span class="vlbl">SAG · Patellar Height</span>
+        <span style="font-size:10px;color:var(--text2);">Mid-sagittal slice for IS / CDI / PTI</span>
+      </div>
+      <div class="viewer-canvas" id="sag-canvas">
+        <img class="slice-img" id="sag-img" alt="">
+        <svg class="overlay" id="sag-svg" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="panel-tag">SAG</div>
+        <div class="slice-counter" id="sag-counter">—</div>
+        <div class="best-slice-marker" id="sag-best-marker"></div>
+      </div>
+      <div class="viewer-scrubber">
+        <button onclick="scrubSlice('sag', -1)">◀</button>
+        <input type="range" id="sag-range" min="1" value="1" oninput="setSlice('sag', this.value)" />
+        <span class="idx" id="sag-idx">— / —</span>
+        <button onclick="scrubSlice('sag', +1)">▶</button>
+      </div>
     </div>
-    <div id="case-view"></div>
-  </section>
+
+    <div class="viewer-panel" id="ax-panel">
+      <div class="viewer-header">
+        <span class="vlbl">AX · Trochlear / Tilt / Lateralization</span>
+        <span class="ax-jumps" id="ax-jumps"></span>
+      </div>
+      <div class="viewer-canvas" id="ax-canvas">
+        <img class="slice-img" id="ax-img" alt="">
+        <svg class="overlay" id="ax-svg" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="panel-tag">AX</div>
+        <div class="slice-counter" id="ax-counter">—</div>
+        <div class="best-slice-marker" id="ax-best-marker"></div>
+      </div>
+      <div class="viewer-scrubber">
+        <button onclick="scrubSlice('ax', -1)">◀</button>
+        <input type="range" id="ax-range" min="1" value="1" oninput="setSlice('ax', this.value)" />
+        <span class="idx" id="ax-idx">— / —</span>
+        <button onclick="scrubSlice('ax', +1)">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="analyze-row">
+    <button id="analyze-btn" onclick="runAnalyze()" disabled>ANALYZE</button>
+  </div>
+
+  <div id="results"></div>
 </main>
 
 <div id="modal-bg" onclick="closeModal(event)">
@@ -160,193 +210,509 @@ footer a { color: var(--text2); }
 </div>
 
 <footer>
-  <div>FOR RESEARCH USE ONLY · Pre-publication prototype · Public test cases from <a href="https://fastmri.med.nyu.edu/" target="_blank">fastMRI dataset</a></div>
-  <div class="cite-list" id="cite-list"></div>
+  Pre-research-use prototype · Public test cases from <a href="https://fastmri.med.nyu.edu/" target="_blank">fastMRI dataset</a><br>
+  Methodology details to appear with published validation paper · Skeletal Radiology, in preparation
 </footer>
 
 <script>
-const DEMO_BASE = 'data';        // local relative path; can be replaced with a CDN base
-let manifest = null;
-let currentCase = null;
-let caseData = {};
+// ── Data + state ────────────────────────────────────────────────────────
+const CASES = [
+  { name: 'case_normal',            label: 'Normal',           comp: 'Normal'   },
+  { name: 'case_alta_confirmed',    label: 'Severe Alta',      comp: 'Severe'   },
+  { name: 'case_anatomic_variant',  label: 'Anatomic variant', comp: 'Mild'     },
+  { name: 'case_severe_dysplasia',  label: 'Severe PFI',       comp: 'Severe'   },
+  { name: 'case_early_dysplasia',   label: 'Early dysplasia',  comp: 'Moderate' },
+];
 
-const VERDICT_COLOURS = {
-  Normal: 'v-normal', 'Borderline Alta': 'v-borderline', 'Borderline Baja': 'v-borderline',
-  Alta: 'v-abnormal', Baja: 'v-abnormal',
+const PHENOTYPE_REC = {
+  'Normal':   'No PFI features identified. No specific imaging follow-up indicated.',
+  'Mild':     'Single-domain finding. Clinical correlation suggested.',
+  'Moderate': 'Multiple PFI features. MSK or sports-medicine consult suggested if symptomatic.',
+  'Severe':   'Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration.',
 };
 
-async function init() {
-  const res = await fetch(`${DEMO_BASE}/manifest_v3.json`);
-  manifest = await res.json();
-  document.getElementById('title').textContent      = manifest.title;
-  document.getElementById('tagline').textContent    = manifest.tagline;
-  document.getElementById('disclaimer').textContent = manifest.disclaimer;
-  document.getElementById('about').textContent      = manifest.about;
-  document.getElementById('methodology').textContent = manifest.methodology_placeholder;
+let currentCase = null;
+let caseData = {};       // { case_name: { meta, overlays, sagSlices: [HTMLImage…], axSlices: [HTMLImage…] } }
+let sagSliceIdx = 0;     // 0-based current slice index for SAG
+let axSliceIdx = 0;
+let analyzed = false;
+let activeAxJump = null;  // 'meas' / 'lti' / 'pcl' / 'patella' / 'tt' / null
 
-  // Citations
-  const cl = document.getElementById('cite-list');
-  cl.innerHTML = '<strong>Literature references</strong><ul>' +
-    manifest.citations.map(c => `<li>· ${c}</li>`).join('') +
-    '</ul>';
-
-  // Cases sidebar
-  const aside = document.getElementById('cases');
-  manifest.cases.forEach(c => {
+// ── Init ────────────────────────────────────────────────────────────────
+function init() {
+  const casesDiv = document.getElementById('cases');
+  CASES.forEach(c => {
     const div = document.createElement('div');
     div.className = 'case-card';
-    div.dataset.case = c.case_name;
-    const compCls = `comp-${c.composite_phenotype}`;
+    div.dataset.case = c.name;
     div.innerHTML = `
       <div class="label">Case</div>
-      <div class="headline">${c.headline}</div>
-      <div class="summary">${c.summary}</div>
-      <span class="badge ${compCls}">${c.composite_phenotype}</span>
-    `;
-    div.onclick = () => selectCase(c.case_name);
-    aside.appendChild(div);
+      <div class="headline">${c.label}</div>
+      <span class="badge comp-${c.comp}">${c.comp}</span>`;
+    div.onclick = () => selectCase(c.name);
+    casesDiv.appendChild(div);
+  });
+  selectCase(CASES[0].name);
+
+  // Keyboard scroll
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') return closeModal();
+    if (e.key >= '1' && e.key <= '5') {
+      const idx = parseInt(e.key) - 1;
+      if (CASES[idx]) selectCase(CASES[idx].name);
+    }
   });
 
-  if (manifest.cases.length) selectCase(manifest.cases[0].case_name);
+  // Mouse wheel scroll on viewers
+  ['sag', 'ax'].forEach(p => {
+    const canvas = document.getElementById(`${p}-canvas`);
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      scrubSlice(p, e.deltaY > 0 ? +1 : -1);
+    }, { passive: false });
+  });
 }
 
+// ── Case selection + load ──────────────────────────────────────────────
 async function selectCase(name) {
   currentCase = name;
+  analyzed = false;
+  activeAxJump = null;
   document.querySelectorAll('.case-card').forEach(c =>
     c.classList.toggle('active', c.dataset.case === name));
+  document.getElementById('results').classList.remove('show');
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.remove('analyzed');
+  btn.textContent = 'ANALYZE';
+  btn.disabled = true;
+
   if (!caseData[name]) {
-    const res = await fetch(`${DEMO_BASE}/${name}/index_v3.json`);
-    caseData[name] = await res.json();
+    await loadCase(name);
   }
-  renderCase(caseData[name]);
-  document.getElementById('welcome').style.display = 'none';
-  document.getElementById('case-view').style.display = 'block';
-}
+  const data = caseData[name];
 
-function verdictForCart(v, cutoff, op, lo, hi) {
-  // 3-tier verdict where cart screening uses Tanaka 3-tier (Normal/Borderline/Abnormal).
-  // Borderline thresholds are conservative (within +/-1 unit of cutoff).
-  if (v === null || v === undefined) return ['—', 'v-info'];
-  const passes = (op === 'ge') ? v >= cutoff : v <= cutoff;
-  if (passes) return ['Abnormal', 'v-abnormal'];
-  // Borderline if within margin
-  const margin = Math.abs(cutoff) * 0.05 + 1.0;   // generic 5% relative or 1 abs unit
-  if ((op === 'ge' && v >= cutoff - margin) || (op === 'le' && v <= cutoff + margin)) {
-    return ['Borderline', 'v-borderline'];
+  // Init slice indices to "best" or first slice
+  sagSliceIdx = (data.overlays?.sag?.best_slice_idx_0based) ?? 0;
+  axSliceIdx = (data.overlays?.ax?.predicted_slices_0based?.meas) ?? 0;
+  if (sagSliceIdx >= data.meta.sag.n_slices) sagSliceIdx = Math.floor(data.meta.sag.n_slices / 2);
+  if (axSliceIdx >= data.meta.ax.n_slices) axSliceIdx = Math.floor(data.meta.ax.n_slices / 2);
+
+  // Build AX jump buttons
+  const jumpsBar = document.getElementById('ax-jumps');
+  jumpsBar.innerHTML = '';
+  if (data.overlays?.ax?.predicted_slices_0based) {
+    const labels = { meas: 'Meas', lti: 'LTI', pcl: 'PCL', patella: 'Tilt', tt: 'TT' };
+    for (const [key, lbl] of Object.entries(labels)) {
+      const idx = data.overlays.ax.predicted_slices_0based[key];
+      if (idx === undefined || idx === null) continue;
+      const b = document.createElement('button');
+      b.textContent = lbl;
+      b.onclick = () => jumpAxTo(key);
+      b.dataset.key = key;
+      jumpsBar.appendChild(b);
+    }
   }
-  return ['Normal', 'v-normal'];
+
+  setSlice('sag', sagSliceIdx + 1);
+  setSlice('ax',  axSliceIdx + 1);
+  // Range max
+  document.getElementById('sag-range').max = data.meta.sag.n_slices;
+  document.getElementById('ax-range').max  = data.meta.ax.n_slices;
+  document.getElementById('sag-best-marker').textContent = `(best slice ${sagSliceIdx + 1})`;
+  document.getElementById('ax-best-marker').textContent  = '';
+  btn.disabled = false;
 }
 
-function categoryClass(cat) {
-  if (!cat) return 'v-info';
-  if (cat === 'Normal') return 'v-normal';
-  if (cat.includes('Borderline')) return 'v-borderline';
-  return 'v-abnormal';
+async function loadCase(name) {
+  const meta = await fetch(`data/${name}/slice_metadata.json`).then(r => r.json());
+  const overlays = await fetch(`data/${name}/overlays.json`).then(r => r.json());
+  // Eagerly preload all slice images (small, ~300KB each)
+  const sagSlices = [], axSlices = [];
+  for (let i = 1; i <= meta.sag.n_slices; i++) {
+    const img = new Image();
+    img.src = `data/${name}/slices/sag/${String(i).padStart(2, '0')}.png`;
+    sagSlices.push(img);
+  }
+  for (let i = 1; i <= meta.ax.n_slices; i++) {
+    const img = new Image();
+    img.src = `data/${name}/slices/ax/${String(i).padStart(2, '0')}.png`;
+    axSlices.push(img);
+  }
+  caseData[name] = { meta, overlays, sagSlices, axSlices };
 }
 
-function renderCase(c) {
-  const v = document.getElementById('case-view');
-  const composite = c.composite_phenotype || 'Normal';
-  const recText = (manifest.phenotype_recommendations || {})[composite] || '';
+// ── Slice scrubbing ─────────────────────────────────────────────────────
+function setSlice(panel, oneBasedIdx) {
+  const data = caseData[currentCase]; if (!data) return;
+  const total = panel === 'sag' ? data.meta.sag.n_slices : data.meta.ax.n_slices;
+  let i = parseInt(oneBasedIdx);
+  if (isNaN(i)) i = 1;
+  if (i < 1) i = 1;
+  if (i > total) i = total;
+  if (panel === 'sag') sagSliceIdx = i - 1;
+  else axSliceIdx = i - 1;
+  document.getElementById(`${panel}-img`).src =
+    (panel === 'sag' ? data.sagSlices : data.axSlices)[i - 1].src;
+  document.getElementById(`${panel}-counter`).textContent = `${i} / ${total}`;
+  document.getElementById(`${panel}-idx`).textContent = `slice ${i} / ${total}`;
+  document.getElementById(`${panel}-range`).value = i;
+  // Redraw overlays if analyzed
+  if (analyzed) {
+    panel === 'sag' ? drawSagOverlay() : drawAxOverlay();
+  } else {
+    document.getElementById(`${panel}-svg`).innerHTML = '';
+  }
+  // Update AX jump buttons active state
+  if (panel === 'ax') updateAxJumpsActiveState();
+}
+
+function scrubSlice(panel, delta) {
+  const cur = parseInt(document.getElementById(`${panel}-range`).value);
+  setSlice(panel, cur + delta);
+}
+
+function jumpAxTo(key) {
+  const data = caseData[currentCase]; if (!data) return;
+  const idx = data.overlays?.ax?.predicted_slices_0based?.[key];
+  if (idx === undefined || idx === null) return;
+  activeAxJump = key;
+  setSlice('ax', idx + 1);
+}
+
+function updateAxJumpsActiveState() {
+  const data = caseData[currentCase]; if (!data) return;
+  const slices = data.overlays?.ax?.predicted_slices_0based || {};
+  const cur = axSliceIdx;
+  document.querySelectorAll('#ax-jumps button').forEach(b => {
+    b.classList.toggle('active', slices[b.dataset.key] === cur);
+  });
+}
+
+// ── Analyze / overlay drawing ──────────────────────────────────────────
+function runAnalyze() {
+  analyzed = true;
+  drawSagOverlay();
+  drawAxOverlay();
+  showResults();
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.add('analyzed');
+  btn.textContent = 'ANALYZED ✓ (re-click to re-draw)';
+}
+
+function drawSagOverlay() {
+  const data = caseData[currentCase]; if (!data) return;
+  const svg = document.getElementById('sag-svg');
+  svg.innerHTML = '';
+  const sag = data.overlays?.sag;
+  if (!sag) return;
+  const onBest = sagSliceIdx === sag.best_slice_idx_0based;
+  if (!onBest) {
+    // Annotation note only — slice is not the best slice, no overlay
+    svg.appendChild(textEl(20, 30, 'IS / CDI / PTI computed at best slice — scroll to highlighted slice', '#FFD700', 12));
+    return;
+  }
+  const lm = sag.landmarks_512px || {};
+  const ind = sag.indices || {};
+  // IS line: patella_top → patella_bottom, then patella_bottom → tibial_tuberosity
+  drawLine(svg, lm['is_patella_top'], lm['is_patella_bottom'], 'var(--ovly-cyan)');  // cart
+  drawLine(svg, lm['is_patella_bottom'], lm['is_tibial_tuberosity'], 'var(--ovly-yellow)');  // tendon
+  drawDot(svg, lm['is_patella_top'], 'var(--ovly-cyan)');
+  drawDot(svg, lm['is_patella_bottom'], 'var(--ovly-cyan)');
+  drawDot(svg, lm['is_tibial_tuberosity'], 'var(--ovly-yellow)');
+  drawTextLabel(svg, lm['is_patella_top'], 8, -8, `IS = ${fmt(ind.IS?.value, 3)} ${ind.IS?.category}`,
+                 verdictHex(ind.IS?.category));
+  // CDI line: cart_top → cart_bottom (cyan); projection cart_bottom to tibial_plateau (yellow)
+  drawLine(svg, lm['cd_cd_cartilage_top'], lm['cd_cd_cartilage_bottom'], 'var(--ovly-cyan)');
+  drawLine(svg, lm['cd_cd_cartilage_bottom'], lm['cd_cd_tibial_plateau'], 'var(--ovly-yellow)');
+  drawDot(svg, lm['cd_cd_cartilage_top'], 'var(--ovly-cyan)');
+  drawDot(svg, lm['cd_cd_cartilage_bottom'], 'var(--ovly-cyan)');
+  drawDot(svg, lm['cd_cd_tibial_plateau'], 'var(--ovly-yellow)');
+  drawTextLabel(svg, lm['cd_cd_cartilage_bottom'], 8, 14, `CDI = ${fmt(ind.CDI?.value, 3)} ${ind.CDI?.category}`,
+                 verdictHex(ind.CDI?.category));
+  // PTI: pc_top→pc_bot (cyan, patella cart), tc_top→tc_bot (yellow, overlap)
+  drawLine(svg, lm['pti_pti_pc_top'], lm['pti_pti_pc_bot'], 'var(--ovly-cyan)', 1.5, true);
+  drawLine(svg, lm['pti_pti_tc_top'], lm['pti_pti_tc_bot'], 'var(--ovly-yellow)', 1.5);
+  drawDot(svg, lm['pti_pti_tc_top'], 'var(--ovly-yellow)');
+  drawDot(svg, lm['pti_pti_tc_bot'], 'var(--ovly-yellow)');
+  drawTextLabel(svg, lm['pti_pti_tc_bot'], 8, 14, `PTI = ${fmt(ind.PTI?.value, 3)} ${ind.PTI?.category}`,
+                 verdictHex(ind.PTI?.category));
+}
+
+function drawAxOverlay() {
+  const data = caseData[currentCase]; if (!data) return;
+  const svg = document.getElementById('ax-svg');
+  svg.innerHTML = '';
+  const ax = data.overlays?.ax;
+  if (!ax) return;
+  const slices = ax.predicted_slices_0based || {};
+  const cur = axSliceIdx;
+
+  // Always draw PCL line if on PCL slice OR project as dashed if on a slice that uses it
+  const pcl = ax.pcl_landmarks_512px || {};
+  if (cur === slices.pcl) {
+    drawLine(svg, pcl['PCL_med'], pcl['PCL_lat'], 'var(--ovly-white)', 1.5);
+    drawDot(svg, pcl['PCL_med'], 'var(--ovly-white)');
+    drawDot(svg, pcl['PCL_lat'], 'var(--ovly-white)');
+    drawTextLabel(svg, pcl['PCL_med'], -10, -8, 'PCL line (reference)', '#FFFFFF');
+  }
+
+  // LTI slice: cart + bone LTI
+  if (cur === slices.lti) {
+    const ltil = ax.lti_landmarks_512px || {};
+    if (ltil.LTI_prox && ltil.LTI_dist) {
+      drawLine(svg, ltil.LTI_prox, ltil.LTI_dist, 'var(--ovly-cyan)', 2);
+      drawDot(svg, ltil.LTI_prox, 'var(--ovly-cyan)');
+      drawDot(svg, ltil.LTI_dist, 'var(--ovly-cyan)');
+    }
+    if (ltil.LTI_prox_bone && ltil.LTI_dist_bone) {
+      drawLine(svg, ltil.LTI_prox_bone, ltil.LTI_dist_bone, 'var(--ovly-orange)', 2, true);
+      drawDot(svg, ltil.LTI_prox_bone, 'var(--ovly-orange)');
+      drawDot(svg, ltil.LTI_dist_bone, 'var(--ovly-orange)');
+    }
+    // Project PCL line as dashed reference
+    if (pcl.PCL_med && pcl.PCL_lat) {
+      drawLine(svg, pcl.PCL_med, pcl.PCL_lat, 'var(--ovly-white)', 1, true);
+    }
+    const lti = ax.indices?.Cart_LTI;
+    const blti = ax.indices?.Bone_LTI;
+    if (ltil.LTI_dist) drawTextLabel(svg, ltil.LTI_dist, 8, -10,
+        `Cart LTI = ${fmt(lti?.value, 1)}° ${lti?.verdict}`, verdictHex(lti?.verdict));
+    if (ltil.LTI_dist_bone) drawTextLabel(svg, ltil.LTI_dist_bone, 8, 18,
+        `Bone LTI = ${fmt(blti?.value, 1)}° ${blti?.verdict}`, verdictHex(blti?.verdict));
+  }
+
+  // Meas slice: SA (cart + bone), TD (cart + bone), TFA (bone)
+  if (cur === slices.meas) {
+    const meas = ax.meas_landmarks_512px || {};
+    if (meas.Med_facet && meas.Sulcus && meas.Lat_facet) {
+      drawLine(svg, meas.Med_facet, meas.Sulcus, 'var(--ovly-cyan)', 2);
+      drawLine(svg, meas.Sulcus, meas.Lat_facet, 'var(--ovly-red)', 2);
+      // Baseline (Med-Lat)
+      drawLine(svg, meas.Med_facet, meas.Lat_facet, 'var(--ovly-green)', 1, true);
+      drawDot(svg, meas.Med_facet, 'var(--ovly-cyan)');
+      drawDot(svg, meas.Sulcus,    'var(--ovly-green)');
+      drawDot(svg, meas.Lat_facet, 'var(--ovly-red)');
+    }
+    if (meas.Med_bone && meas.Sulcus_bone && meas.Lat_bone) {
+      drawLine(svg, meas.Med_bone, meas.Sulcus_bone, 'var(--ovly-orange)', 1.5, true);
+      drawLine(svg, meas.Sulcus_bone, meas.Lat_bone, 'var(--ovly-orange)', 1.5, true);
+      drawDot(svg, meas.Med_bone,    'var(--ovly-orange)');
+      drawDot(svg, meas.Sulcus_bone, 'var(--ovly-orange)');
+      drawDot(svg, meas.Lat_bone,    'var(--ovly-orange)');
+    }
+    const csa = ax.indices?.Cart_SA;
+    const ctd = ax.indices?.Cart_TD;
+    const btfa = ax.indices?.Bone_TFA;
+    if (meas.Sulcus) drawTextLabel(svg, meas.Sulcus, -10, 24,
+        `Cart SA = ${fmt(csa?.value, 1)}° ${csa?.verdict} · TD = ${fmt(ctd?.value, 2)} mm ${ctd?.verdict}`,
+        verdictHex(csa?.verdict));
+    if (meas.Sulcus_bone) drawTextLabel(svg, meas.Sulcus_bone, -10, 38,
+        `Bone TFA = ${fmt(btfa?.value, 3)} ${btfa?.verdict}`, verdictHex(btfa?.verdict));
+  }
+
+  // Patella slice: Tilt
+  if (cur === slices.patella) {
+    const patl = ax.patella_landmarks_512px || {};
+    if (patl.Patella_med_edge && patl.Patella_lat_edge) {
+      drawLine(svg, patl.Patella_med_edge, patl.Patella_lat_edge, 'var(--ovly-yellow)', 2);
+      drawDot(svg, patl.Patella_med_edge, 'var(--ovly-yellow)');
+      drawDot(svg, patl.Patella_lat_edge, 'var(--ovly-yellow)');
+      // Project PCL dashed
+      if (pcl.PCL_med && pcl.PCL_lat) {
+        drawLine(svg, pcl.PCL_med, pcl.PCL_lat, 'var(--ovly-white)', 1, true);
+      }
+      const tilt = ax.indices?.Patellar_Tilt;
+      drawTextLabel(svg, patl.Patella_lat_edge, 8, -10,
+          `Patellar Tilt = ${fmt(tilt?.value, 1)}° ${tilt?.verdict}`, verdictHex(tilt?.verdict));
+    }
+  }
+
+  // TT slice: TT_anterior + projected reference
+  if (cur === slices.tt) {
+    const tt = ax.tt_landmarks_512px || {};
+    if (tt.TT_anterior) {
+      drawDot(svg, tt.TT_anterior, 'var(--ovly-yellow)', 6);
+      const meas = ax.meas_landmarks_512px || {};
+      if (meas.Sulcus) {
+        // Project Sulcus_cart vertical line as TG reference
+        drawLine(svg, [meas.Sulcus[0], 20], [meas.Sulcus[0], 492], 'var(--ovly-cyan)', 1, true);
+      }
+      drawLine(svg, [tt.TT_anterior[0], 20], [tt.TT_anterior[0], 492], 'var(--ovly-yellow)', 1, true);
+      const pttg = ax.indices?.PT_TG_cart;
+      drawTextLabel(svg, tt.TT_anterior, 8, -10,
+          `PT-TG = ${fmt(pttg?.value, 1)} mm ${pttg?.verdict}`, verdictHex(pttg?.verdict));
+    }
+  }
+}
+
+// ── SVG helpers ────────────────────────────────────────────────────────
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function drawLine(svg, p1, p2, stroke, width = 2, dashed = false) {
+  if (!p1 || !p2) return;
+  const ln = document.createElementNS(SVG_NS, 'line');
+  ln.setAttribute('x1', p1[0]); ln.setAttribute('y1', p1[1]);
+  ln.setAttribute('x2', p2[0]); ln.setAttribute('y2', p2[1]);
+  ln.setAttribute('stroke', stroke);
+  ln.setAttribute('stroke-width', width);
+  ln.setAttribute('stroke-linecap', 'round');
+  if (dashed) ln.setAttribute('stroke-dasharray', '6 4');
+  svg.appendChild(ln);
+}
+function drawDot(svg, p, fill, r = 4) {
+  if (!p) return;
+  const c = document.createElementNS(SVG_NS, 'circle');
+  c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', r);
+  c.setAttribute('fill', fill);
+  c.setAttribute('stroke', '#fff');
+  c.setAttribute('stroke-width', '0.8');
+  svg.appendChild(c);
+}
+function drawTextLabel(svg, anchor, dx, dy, text, color) {
+  if (!anchor) return;
+  // bg rect
+  const tx = anchor[0] + dx, ty = anchor[1] + dy;
+  const padX = 4, padY = 2, fontSize = 11;
+  // Approximate text width
+  const w = text.length * 5.6 + padX * 2;
+  const rect = document.createElementNS(SVG_NS, 'rect');
+  rect.setAttribute('x', tx); rect.setAttribute('y', ty - fontSize - 1);
+  rect.setAttribute('width', w); rect.setAttribute('height', fontSize + padY * 2);
+  rect.setAttribute('fill', 'rgba(0,0,0,0.6)');
+  rect.setAttribute('rx', '2');
+  svg.appendChild(rect);
+  const t = document.createElementNS(SVG_NS, 'text');
+  t.setAttribute('x', tx + padX); t.setAttribute('y', ty + 2);
+  t.setAttribute('fill', color || '#fff');
+  t.setAttribute('font-size', fontSize);
+  t.setAttribute('font-family', 'system-ui, sans-serif');
+  t.setAttribute('font-weight', '600');
+  t.textContent = text;
+  svg.appendChild(t);
+}
+function textEl(x, y, text, color = '#fff', size = 12) {
+  const t = document.createElementNS(SVG_NS, 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('fill', color); t.setAttribute('font-size', size);
+  t.setAttribute('font-family', 'system-ui, sans-serif');
+  t.textContent = text;
+  return t;
+}
+function verdictHex(v) {
+  if (!v) return '#fff';
+  if (v === 'Normal') return '#4CAF50';
+  if (v === 'Borderline' || v.includes('Borderline')) return '#FFC107';
+  return '#F44336';
+}
+function fmt(v, dec) {
+  if (v === null || v === undefined) return '—';
+  return typeof v === 'number' ? v.toFixed(dec ?? 2) : String(v);
+}
+
+// ── Results panel + report ─────────────────────────────────────────────
+function showResults() {
+  const data = caseData[currentCase]; if (!data) return;
+  const ovl = data.overlays;
+  const comp = ovl.composite_phenotype || 'Normal';
+  const rec = PHENOTYPE_REC[comp] || ovl.recommendation || '';
+  const sag = ovl.sag || {}; const ax = ovl.ax || {};
+  const sagInd = sag.indices || {}; const axInd = ax.indices || {};
 
   let html = `
     <div class="composite-card">
-      <div class="composite-headline">Composite phenotype</div>
-      <span class="composite-badge comp-${composite}">${composite}</span>
-      <div class="composite-rec">${recText}</div>
+      <div>
+        <div class="composite-headline">Composite phenotype</div>
+        <span class="composite-badge comp-${comp}">${comp}</span>
+      </div>
+      <div class="composite-rec">${rec}</div>
     </div>`;
 
   // Domain A — Patellar Height
-  const ph = c.patellar_height || {};
-  const ph_comp = c.patellar_height_composite || 'normal';
-  const phVerdict = ph_comp === 'normal' ? ['Normal', 'v-normal']
-                   : ph_comp.includes('borderline') ? ['Borderline', 'v-borderline']
-                   : ['Abnormal', 'v-abnormal'];
+  const phComp = (ovl.sag && (
+    sagInd.IS?.category === 'Alta' || sagInd.CDI?.category === 'Alta' || sagInd.PTI?.category === 'Alta' ||
+    sagInd.IS?.category === 'Baja' || sagInd.CDI?.category === 'Baja' || sagInd.PTI?.category === 'Baja')) ? 'positive' : 'normal';
+  const phVerdict = phComp === 'positive' ? ['alta/baja', 'v-abnormal'] : ['Normal', 'v-normal'];
   html += panelHtml('A — Patellar Height', phVerdict, [
-    indexCardHtml('Insall-Salvati index', ph.IS, 'IS'),
-    indexCardHtml('Caton-Deschamps index', ph.CDI, 'CDI'),
-    indexCardHtml('Patellotrochlear index', ph.PTI, 'PTI'),
+    idxRow('Insall-Salvati (IS)',  sagInd.IS?.value, '', sagInd.IS?.category, 'Insall 1971 / Miller 1996 / Shabshin 2004'),
+    idxRow('Caton-Deschamps (CDI)', sagInd.CDI?.value, '', sagInd.CDI?.category, 'Caton 1982'),
+    idxRow('Patellotrochlear (PTI)', sagInd.PTI?.value, '', sagInd.PTI?.category, 'Biedert 2006'),
   ]);
 
   // Domain B — Trochlear Morphology
-  const td = c.trochlear_dysplasia || {};
-  const grade = td.composite_grade || 'no_dysplasia';
-  const tdVerdict = grade === 'no_dysplasia' ? ['No dysplasia', 'v-normal']
-                   : grade === 'low_grade'   ? ['Low grade', 'v-borderline']
-                   : grade === 'moderate'    ? ['Moderate', 'v-borderline']
-                                              : ['High grade', 'v-abnormal'];
-  const cs = td.cart_screening || {};
-  const bc = td.bone_convention || {};
-  html += panelHtml('B — Trochlear Morphology (cart-primary, bone corroboration)', tdVerdict, [
-    `<div style="font-size:12px;color:var(--text2);margin:8px 0 6px;font-weight:600;letter-spacing:0.5px;">Cart screening (Tanaka 2023)</div>`,
-    indexCardHtmlGeneric('Cart Sulcus Angle (SA)',  cs.Cart_SA,  'deg'),
-    indexCardHtmlGeneric('Cart Lateral Trochlear Inclination (LTI)', cs.Cart_LTI, 'deg'),
-    indexCardHtmlGeneric('Cart Trochlear Depth (TD)', cs.Cart_TD, 'mm'),
-    `<div style="font-size:12px;color:var(--text2);margin:14px 0 6px;font-weight:600;letter-spacing:0.5px;">Bone corroboration (Pfirrmann / Carrillon)</div>`,
-    indexCardHtmlGeneric('Bone Sulcus Angle',  bc.Bone_SA,  'deg'),
-    indexCardHtmlGeneric('Bone Lateral Trochlear Inclination', bc.Bone_LTI, 'deg'),
-    indexCardHtmlGeneric('Bone Trochlear Depth', bc.Bone_TD, 'mm'),
-    indexCardHtmlGeneric('Bone Trochlear Facet Asymmetry', bc.Bone_TFA, 'ratio'),
+  const grade = (() => {
+    let n = 0;
+    if (axInd.Cart_LTI?.verdict === 'Abnormal') n++;
+    if (axInd.Cart_SA?.verdict === 'Abnormal') n++;
+    if (axInd.Cart_TD?.verdict === 'Abnormal') n++;
+    if (axInd.Bone_TFA?.verdict === 'Abnormal') n++;
+    return n === 0 ? ['No dysplasia', 'v-normal']
+         : n === 1 ? ['Low grade', 'v-borderline']
+         : n <= 3  ? ['Moderate', 'v-borderline']
+         :           ['High grade', 'v-abnormal'];
+  })();
+  html += panelHtml('B — Trochlear Morphology', grade, [
+    `<div style="font-size:10px;color:var(--text2);margin:6px 0 4px;font-weight:600;">Cart screening (Tanaka 2023)</div>`,
+    idxRow('Cart Sulcus Angle',  axInd.Cart_SA?.value, '°', axInd.Cart_SA?.verdict, axInd.Cart_SA?.reference),
+    idxRow('Cart LTI',           axInd.Cart_LTI?.value, '°', axInd.Cart_LTI?.verdict, axInd.Cart_LTI?.reference),
+    idxRow('Cart Trochlear Depth (TD)', axInd.Cart_TD?.value, ' mm', axInd.Cart_TD?.verdict, axInd.Cart_TD?.reference),
+    `<div style="font-size:10px;color:var(--text2);margin:10px 0 4px;font-weight:600;">Bone corroboration (Pfirrmann / Carrillon)</div>`,
+    idxRow('Bone Sulcus Angle',  axInd.Bone_SA?.value, '°', axInd.Bone_SA?.verdict, axInd.Bone_SA?.reference),
+    idxRow('Bone LTI',           axInd.Bone_LTI?.value, '°', axInd.Bone_LTI?.verdict, axInd.Bone_LTI?.reference),
+    idxRow('Bone Trochlear Depth', axInd.Bone_TD?.value, ' mm', axInd.Bone_TD?.verdict, axInd.Bone_TD?.reference),
+    idxRow('Bone Trochlear Facet Asymmetry', axInd.Bone_TFA?.value, ' ratio', axInd.Bone_TFA?.verdict, axInd.Bone_TFA?.reference),
   ]);
 
   // Domain C — Lateralization
-  const lat = c.lateralization || {};
-  const latPheno = lat.phenotype || 'normal';
-  const latVerdict = latPheno === 'lateralized' ? ['Lateralized', 'v-abnormal']
-                                                  : ['Normal', 'v-normal'];
-  html += panelHtml('C — Lateralization', latVerdict, [
-    indexCardHtmlGeneric('Patellar Tendon - Trochlear Groove (PT-TG)', lat, 'mm'),
+  const lat = axInd.PT_TG_cart;
+  html += panelHtml('C — Lateralization', [lat?.verdict || 'Normal', verdictCls(lat?.verdict)], [
+    idxRow('Patellar Tendon - Trochlear Groove', lat?.value, ' mm', lat?.verdict, 'Hinckel 2015'),
   ]);
 
   // Domain D — Patellar Tilt
-  const pt = c.patellar_tilt || {};
-  const ptPheno = pt.phenotype || 'normal';
-  const ptVerdict = ptPheno === 'tilted' ? ['Tilted', 'v-abnormal'] : ['Normal', 'v-normal'];
-  html += panelHtml('D — Patellar Tilt', ptVerdict, [
-    indexCardHtmlGeneric('Patellar Tilt angle', pt, 'deg'),
+  const tilt = axInd.Patellar_Tilt;
+  html += panelHtml('D — Patellar Tilt', [tilt?.verdict || 'Normal', verdictCls(tilt?.verdict)], [
+    idxRow('Patellar Tilt', tilt?.value, '°', tilt?.verdict, 'Sallay 1996'),
   ]);
 
   // Discordance flags
-  if (c.discordance_flags && c.discordance_flags.length) {
-    html += `<div class="flags-section">
-      <h3>📌 Discordance flags</h3>
-      ${c.discordance_flags.map(f => `
-        <div class="flag-card">
-          <div class="flag-title">${f.title}</div>
-          <div class="flag-text">${f.text}</div>
-        </div>`).join('')}
-    </div>`;
+  if (ovl.discordance_flags && ovl.discordance_flags.length) {
+    html += `<div class="flags-section"><h3>📌 Discordance flags</h3>`;
+    ovl.discordance_flags.forEach(f => {
+      html += `<div class="flag-card">
+        <div class="flag-title">${f.title}</div>
+        <div class="flag-text">${f.text}</div>
+      </div>`;
+    });
+    html += `</div>`;
   }
 
-  // Internal verification (de-emphasized)
-  const iv = c.internal_verification || {};
-  if (iv.Cart_TFA || iv.sPT_TG_cart) {
+  // Internal verification (supplementary)
+  const intern = ax.internal || {};
+  if (intern.Cart_TFA || intern.sPT_TG_cart) {
     html += `<div class="internal-section">
       <h3>Internal verification (supplementary)</h3>
       <div class="label">Computed for internal consistency only — not primary screening output.</div>`;
-    if (iv.Cart_TFA && iv.Cart_TFA.value !== undefined && iv.Cart_TFA.value !== null) {
-      html += `<div class="internal-row"><span class="iname">Cart-TFA (cart-bone consistency check)</span><span class="ival">${formatVal(iv.Cart_TFA.value, 'ratio')}</span></div>`;
+    if (intern.Cart_TFA?.value !== null && intern.Cart_TFA?.value !== undefined) {
+      html += `<div class="internal-row"><span class="iname">Cart-TFA (cart-bone consistency check)</span><span class="ival">${fmt(intern.Cart_TFA.value, 3)}</span></div>`;
     }
-    if (iv.sPT_TG_cart && iv.sPT_TG_cart.value !== undefined && iv.sPT_TG_cart.value !== null) {
-      html += `<div class="internal-row"><span class="iname">Signed PT-TG (AP-axis check)</span><span class="ival">${formatVal(iv.sPT_TG_cart.value, 'mm')}</span></div>`;
+    if (intern.sPT_TG_cart?.value !== null && intern.sPT_TG_cart?.value !== undefined) {
+      html += `<div class="internal-row"><span class="iname">Signed PT-TG (AP-axis check)</span><span class="ival">${fmt(intern.sPT_TG_cart.value, 2)} mm</span></div>`;
     }
     html += `</div>`;
   }
 
   html += `<button id="report-btn" onclick="generateReport()">Generate text report</button>`;
 
-  v.innerHTML = html;
-
-  // Bind accordion
+  const r = document.getElementById('results');
+  r.innerHTML = html;
+  r.classList.add('show');
   document.querySelectorAll('.domain-header').forEach(h => {
     h.onclick = () => h.parentElement.classList.toggle('expanded');
   });
-  // Auto-expand all panels by default for the demo
   document.querySelectorAll('.domain-panel').forEach(p => p.classList.add('expanded'));
 }
 
-function panelHtml(title, verdict, body) {
-  const [vText, vCls] = verdict;
+function panelHtml(title, [vText, vCls], body) {
   const inner = Array.isArray(body) ? body.join('') : body;
   return `<div class="domain-panel expanded">
     <div class="domain-header">
@@ -359,138 +725,62 @@ function panelHtml(title, verdict, body) {
     <div class="domain-body">${inner}</div>
   </div>`;
 }
-
-function indexCardHtml(name, idx, key) {
-  if (!idx) return '';
-  const cat = idx.category || '—';
-  const cls = categoryClass(cat);
-  const ref = idx.reference || '';
-  const v   = formatVal(idx.value, '');
-  const tA  = idx.cutoff_alta;
-  const tB  = idx.cutoff_baja;
-  const ths = `Alta &gt; ${tA} · Baja &lt; ${tB}`;
-  return `<div class="index-card">
-    <div class="row1">
-      <div>
-        <div class="name">${name}</div>
-        <div class="ref">${ref}</div>
-      </div>
-      <div class="right">
-        <span class="value">${v}</span>
-        <span class="verdict ${cls}">${cat}</span>
-      </div>
-    </div>
-    <div class="threshold">Thresholds: ${ths}</div>
-  </div>`;
+function verdictCls(v) {
+  if (!v || v === 'Normal') return 'v-normal';
+  if (v === 'Borderline' || v.includes('Borderline')) return 'v-borderline';
+  return 'v-abnormal';
 }
-
-function indexCardHtmlGeneric(name, idx, unit) {
-  if (!idx) return '';
-  const v = idx.value;
-  if (v === undefined || v === null) {
-    return `<div class="index-card">
-      <div class="row1">
-        <div><div class="name">${name}</div></div>
-        <div class="right"><span class="verdict v-info">N/A</span></div>
-      </div></div>`;
-  }
-  const cutoff = idx.cutoff;
-  const op = idx.op || 'ge';
-  const [vText, vCls] = verdictForCart(v, cutoff, op);
-  const ref = idx.reference || '';
-  const opSym = op === 'ge' ? '&ge;' : '&le;';
-  const ths = `Threshold: ${opSym} ${cutoff}`;
-  return `<div class="index-card">
-    <div class="row1">
-      <div>
-        <div class="name">${name}</div>
-        <div class="ref">${ref}</div>
-      </div>
-      <div class="right">
-        <span class="value">${formatVal(v, unit)}</span>
-        <span class="verdict ${vCls}">${vText}</span>
-      </div>
+function idxRow(name, value, unit, verdict, ref) {
+  return `<div class="idx-card">
+    <div>
+      <div class="name">${name}</div>
+      <div class="ref">${ref || ''}</div>
     </div>
-    <div class="threshold">${ths} ${unit ? `(${unit})` : ''}</div>
+    <div class="right">
+      <span class="value">${fmt(value, value && Math.abs(value) < 1 ? 3 : 2)}${unit || ''}</span>
+      <span class="verdict ${verdictCls(verdict)}">${verdict || '—'}</span>
+    </div>
   </div>`;
-}
-
-function formatVal(v, unit) {
-  if (v === null || v === undefined) return '—';
-  let s;
-  if (typeof v === 'number') {
-    if (Math.abs(v) < 1) s = v.toFixed(3);
-    else if (Math.abs(v) < 10) s = v.toFixed(2);
-    else s = v.toFixed(1);
-  } else s = String(v);
-  if (unit && unit !== 'ratio') s += ` ${unit}`;
-  return s;
 }
 
 function generateReport() {
-  const c = caseData[currentCase];
-  if (!c) return;
+  const data = caseData[currentCase]; if (!data) return;
+  const ovl = data.overlays;
   const lines = [];
   lines.push(`PATELLOFEMORAL INSTABILITY ASSESSMENT (automated)`);
   lines.push(``);
-  lines.push(`Case label : ${(manifest.cases.find(x => x.case_name === currentCase) || {}).headline || currentCase}`);
-  lines.push(`Composite phenotype : ${c.composite_phenotype || '?'}`);
+  lines.push(`Case      : ${ovl.headline}`);
+  lines.push(`Composite : ${ovl.composite_phenotype}`);
   lines.push(``);
-  // Patellar Height
-  lines.push(`PATELLAR HEIGHT`);
-  const ph = c.patellar_height || {};
-  ['IS','CDI','PTI'].forEach(k => {
-    const i = ph[k];
-    if (!i) return;
-    lines.push(`  ${k.padEnd(4)} : ${formatVal(i.value,'')}  (${i.category || '—'})  [${i.reference}]`);
-  });
-  lines.push(`  Composite : ${c.patellar_height_composite}`);
-  lines.push(``);
-  // Trochlear
-  lines.push(`TROCHLEAR MORPHOLOGY`);
-  const td = c.trochlear_dysplasia || {};
-  const cs = td.cart_screening || {};
-  const bc = td.bone_convention || {};
-  lines.push(`  Cart screening (Tanaka 2023):`);
-  ['Cart_SA','Cart_LTI','Cart_TD'].forEach(k => {
-    const i = cs[k]; if (!i) return;
-    lines.push(`    ${k.padEnd(8)} = ${formatVal(i.value,'')}  threshold ${i.op === 'ge' ? '>=' : '<='} ${i.cutoff}`);
-  });
-  lines.push(`  Bone corroboration (Pfirrmann / Carrillon):`);
-  ['Bone_SA','Bone_LTI','Bone_TD','Bone_TFA'].forEach(k => {
-    const i = bc[k]; if (!i) return;
-    lines.push(`    ${k.padEnd(8)} = ${formatVal(i.value,'')}  threshold ${i.op === 'ge' ? '>=' : '<='} ${i.cutoff}`);
-  });
-  lines.push(`  Composite grade : ${td.composite_grade}`);
-  lines.push(``);
-  // Lateralization + tilt
-  const lat = c.lateralization || {};
-  if (lat.value !== undefined) {
-    lines.push(`LATERALIZATION (Hinckel 2015 PT-TG)`);
-    lines.push(`  Value : ${formatVal(lat.value,'mm')}  threshold >= ${lat.cutoff} mm  -> ${lat.phenotype}`);
-    lines.push(``);
+  lines.push(`PATELLAR HEIGHT (SAG)`);
+  for (const k of ['IS', 'CDI', 'PTI']) {
+    const i = ovl.sag?.indices?.[k]; if (!i) continue;
+    lines.push(`  ${k.padEnd(4)} ${fmt(i.value, 3)}  (${i.category})`);
   }
-  const pt = c.patellar_tilt || {};
-  if (pt.value !== undefined) {
-    lines.push(`PATELLAR TILT (Sallay 1996)`);
-    lines.push(`  Value : ${formatVal(pt.value,'deg')}  threshold >= ${pt.cutoff} deg  -> ${pt.phenotype}`);
-    lines.push(``);
+  lines.push(``);
+  lines.push(`TROCHLEAR MORPHOLOGY (AX)`);
+  lines.push(`  Cart (Tanaka 2023):`);
+  for (const k of ['Cart_SA', 'Cart_LTI', 'Cart_TD']) {
+    const i = ovl.ax?.indices?.[k]; if (!i) continue;
+    lines.push(`    ${k.padEnd(10)} ${fmt(i.value, 2)} (${i.verdict})`);
   }
-  // Flags
-  if (c.discordance_flags && c.discordance_flags.length) {
+  lines.push(`  Bone (Pfirrmann/Carrillon):`);
+  for (const k of ['Bone_SA', 'Bone_LTI', 'Bone_TD', 'Bone_TFA']) {
+    const i = ovl.ax?.indices?.[k]; if (!i) continue;
+    lines.push(`    ${k.padEnd(10)} ${fmt(i.value, 2)} (${i.verdict})`);
+  }
+  lines.push(``);
+  const lat = ovl.ax?.indices?.PT_TG_cart;
+  if (lat) lines.push(`LATERALIZATION (Hinckel 2015)\n  PT-TG = ${fmt(lat.value, 1)} mm (${lat.verdict})\n`);
+  const tilt = ovl.ax?.indices?.Patellar_Tilt;
+  if (tilt) lines.push(`PATELLAR TILT (Sallay 1996)\n  ${fmt(tilt.value, 1)}° (${tilt.verdict})\n`);
+  if (ovl.discordance_flags && ovl.discordance_flags.length) {
     lines.push(`FLAGS:`);
-    c.discordance_flags.forEach(f => {
-      lines.push(`  - ${f.title}`);
-      lines.push(`    ${f.text}`);
-    });
+    ovl.discordance_flags.forEach(f => lines.push(`  - ${f.title}\n    ${f.text}`));
     lines.push(``);
   }
-  // Recommendation
-  const rec = (manifest.phenotype_recommendations || {})[c.composite_phenotype];
-  if (rec) {
-    lines.push(`RECOMMENDATION : ${rec}`);
-    lines.push(``);
-  }
+  lines.push(`RECOMMENDATION: ${ovl.recommendation || PHENOTYPE_REC[ovl.composite_phenotype]}`);
+  lines.push(``);
   lines.push(`---`);
   lines.push(`FOR RESEARCH USE ONLY. Pre-publication prototype.`);
   document.getElementById('report-text').textContent = lines.join('\n');
@@ -501,23 +791,13 @@ function closeModal(e) {
   if (e && e.target.id !== 'modal-bg' && e.type === 'click') return;
   document.getElementById('modal-bg').classList.remove('show');
 }
-
 function copyReport() {
-  const text = document.getElementById('report-text').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.classList.add('copied');
-    btn.textContent = 'Copied!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.textContent = 'Copy to clipboard';
-    }, 1500);
+  navigator.clipboard.writeText(document.getElementById('report-text').textContent).then(() => {
+    const b = document.getElementById('copy-btn');
+    b.classList.add('copied'); b.textContent = 'Copied!';
+    setTimeout(() => { b.classList.remove('copied'); b.textContent = 'Copy to clipboard'; }, 1500);
   });
 }
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
 
 init();
 </script>
