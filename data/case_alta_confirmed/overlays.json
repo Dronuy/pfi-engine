@@ -227,6 +227,120 @@
       "text": "Cartilaginous trochlea shows dysplasia features (flat or shallow groove on cartilage), but underlying bone is normal. This pattern is described in early or cartilaginous dysplasia and may warrant MSK fellowship review."
     }
   ],
-  "recommendation": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration.",
-  "image_render_size_px": 512
+  "recommendation": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration. MSK fellowship review recommended (early/cartilaginous dysplasia pattern).",
+  "image_render_size_px": 512,
+  "phenotype_v2": {
+    "domain_a_alta": {
+      "weighted_score": 1.0,
+      "concordance_pattern": "all_three_alta",
+      "verdict": "Severe Alta",
+      "confidence": "High",
+      "drivers": [
+        "IS Alta",
+        "CDI Alta",
+        "PTI Alta"
+      ],
+      "flags": [],
+      "per_index": {
+        "IS": {
+          "value": 1.47,
+          "category": "Alta"
+        },
+        "CDI": {
+          "value": 1.527,
+          "category": "Alta"
+        },
+        "PTI": {
+          "value": 0.078,
+          "category": "Alta"
+        }
+      },
+      "drivers_lines": [
+        "IS  = 1.470  (Alta)",
+        "CDI = 1.527 (Alta)",
+        "PTI = 0.078 (Alta)"
+      ]
+    },
+    "domain_b_td": {
+      "cart_score": 0.376,
+      "bone_score": 0.0,
+      "agreement": "cart_only",
+      "verdict": "Early / cartilaginous dysplasia \u2014 MSK consult",
+      "confidence": "Moderate",
+      "drivers": [
+        "Cart_LTI 12.75\u00b0 (\u226413.0)"
+      ],
+      "flags": [
+        "early_dysplasia"
+      ],
+      "per_index_cart": {
+        "Cart_LTI": {
+          "value": 12.7542,
+          "category": "Abnormal"
+        },
+        "Cart_SA": {
+          "value": 144.8773,
+          "category": "Normal"
+        },
+        "Cart_TD": {
+          "value": 4.5898,
+          "category": "Normal"
+        }
+      },
+      "per_index_bone": {
+        "Bone_LTI": {
+          "value": 17.7464,
+          "category": "Normal"
+        },
+        "Bone_SA": {
+          "value": 132.5427,
+          "category": "Normal"
+        },
+        "Bone_TD": {
+          "value": 7.9593,
+          "category": "Normal"
+        },
+        "Bone_TFA": {
+          "value": 0.4151,
+          "category": "Normal"
+        }
+      }
+    },
+    "domain_c_lateralization": {
+      "value": 17.2962,
+      "category": "Abnormal",
+      "verdict": "Lateralization abnormal \u2014 Hinckel \u226515.5 mm surgical-consideration cutoff",
+      "confidence": "High",
+      "drivers": [
+        "PT-TG 17.30 mm (\u226515.5)"
+      ],
+      "flags": []
+    },
+    "domain_d_tilt": {
+      "value": 13.7758,
+      "category": "Normal",
+      "verdict": "Normal",
+      "confidence": "High",
+      "drivers": [],
+      "flags": []
+    },
+    "phenotype": {
+      "schema_version": "v2.0",
+      "pfi_risk": "Severe",
+      "positive_domains": [
+        "A",
+        "B",
+        "C"
+      ],
+      "drivers": [
+        "Severe alta",
+        "Trochlear dysplasia",
+        "Lateralization (PT-TG)"
+      ],
+      "flags": [
+        "early_dysplasia"
+      ],
+      "recommendation": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration. MSK fellowship review recommended (early/cartilaginous dysplasia pattern)."
+    }
+  }
 }

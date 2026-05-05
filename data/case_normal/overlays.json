@@ -222,5 +222,99 @@
   "composite_phenotype": "Normal",
   "discordance_flags": [],
   "recommendation": "No PFI features identified. No specific imaging follow-up indicated.",
-  "image_render_size_px": 512
+  "image_render_size_px": 512,
+  "phenotype_v2": {
+    "domain_a_alta": {
+      "weighted_score": 0.0,
+      "concordance_pattern": "all_normal",
+      "verdict": "Normal",
+      "confidence": "High",
+      "drivers": [],
+      "flags": [],
+      "per_index": {
+        "IS": {
+          "value": 1.102,
+          "category": "Normal"
+        },
+        "CDI": {
+          "value": 1.128,
+          "category": "Normal"
+        },
+        "PTI": {
+          "value": 0.488,
+          "category": "Normal"
+        }
+      },
+      "drivers_lines": [
+        "IS  = 1.102  (Normal)",
+        "CDI = 1.128 (Normal)",
+        "PTI = 0.488 (Normal)"
+      ]
+    },
+    "domain_b_td": {
+      "cart_score": 0.0,
+      "bone_score": 0.0,
+      "agreement": "neither",
+      "verdict": "No dysplasia",
+      "confidence": "High",
+      "drivers": [],
+      "flags": [],
+      "per_index_cart": {
+        "Cart_LTI": {
+          "value": 15.7265,
+          "category": "Normal"
+        },
+        "Cart_SA": {
+          "value": 142.5274,
+          "category": "Normal"
+        },
+        "Cart_TD": {
+          "value": 4.5903,
+          "category": "Normal"
+        }
+      },
+      "per_index_bone": {
+        "Bone_LTI": {
+          "value": 18.621,
+          "category": "Normal"
+        },
+        "Bone_SA": {
+          "value": 118.7648,
+          "category": "Normal"
+        },
+        "Bone_TD": {
+          "value": 8.8295,
+          "category": "Normal"
+        },
+        "Bone_TFA": {
+          "value": 0.3269,
+          "category": "Normal"
+        }
+      }
+    },
+    "domain_c_lateralization": {
+      "value": 12.6188,
+      "category": "Normal",
+      "verdict": "Normal",
+      "confidence": "High",
+      "drivers": [],
+      "flags": []
+    },
+    "domain_d_tilt": {
+      "value": 12.1441,
+      "category": "Normal",
+      "verdict": "Normal",
+      "confidence": "High",
+      "drivers": [],
+      "flags": []
+    },
+    "phenotype": {
+      "schema_version": "v2.0",
+      "pfi_risk": "Normal",
+      "positive_domains": [],
+      "drivers": [],
+      "flags": [],
+      "recommendation": "No PFI features identified. No specific imaging follow-up indicated."
+    }
+  }
 }

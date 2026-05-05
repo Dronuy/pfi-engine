@@ -222,5 +222,119 @@
   "composite_phenotype": "Severe",
   "discordance_flags": [],
   "recommendation": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration.",
-  "image_render_size_px": 512
+  "image_render_size_px": 512,
+  "phenotype_v2": {
+    "domain_a_alta": {
+      "weighted_score": 0.6,
+      "concordance_pattern": "two_of_three_alta",
+      "verdict": "Likely Alta",
+      "confidence": "Moderate",
+      "drivers": [
+        "IS Alta",
+        "PTI Alta"
+      ],
+      "flags": [],
+      "per_index": {
+        "IS": {
+          "value": 1.331,
+          "category": "Alta"
+        },
+        "CDI": {
+          "value": 1.196,
+          "category": "Normal"
+        },
+        "PTI": {
+          "value": 0.122,
+          "category": "Alta"
+        }
+      },
+      "drivers_lines": [
+        "IS  = 1.331  (Alta)",
+        "CDI = 1.196 (Normal)",
+        "PTI = 0.122 (Alta)"
+      ]
+    },
+    "domain_b_td": {
+      "cart_score": 0.248,
+      "bone_score": 0.3,
+      "agreement": "concordant",
+      "verdict": "Trochlear dysplasia confirmed (cart + bone)",
+      "confidence": "High",
+      "drivers": [
+        "Cart_SA 166.82\u00b0 (\u2265154.0)",
+        "Bone_SA 149.81\u00b0 (\u2265145.0)"
+      ],
+      "flags": [],
+      "per_index_cart": {
+        "Cart_LTI": {
+          "value": 14.5901,
+          "category": "Normal"
+        },
+        "Cart_SA": {
+          "value": 166.8241,
+          "category": "Abnormal"
+        },
+        "Cart_TD": {
+          "value": 3.095,
+          "category": "Normal"
+        }
+      },
+      "per_index_bone": {
+        "Bone_LTI": {
+          "value": 16.3763,
+          "category": "Normal"
+        },
+        "Bone_SA": {
+          "value": 149.8083,
+          "category": "Abnormal"
+        },
+        "Bone_TD": {
+          "value": 5.135,
+          "category": "Normal"
+        },
+        "Bone_TFA": {
+          "value": 0.7098,
+          "category": "Abnormal"
+        }
+      }
+    },
+    "domain_c_lateralization": {
+      "value": 22.526,
+      "category": "Abnormal",
+      "verdict": "Lateralization abnormal \u2014 Hinckel \u226515.5 mm surgical-consideration cutoff",
+      "confidence": "High",
+      "drivers": [
+        "PT-TG 22.53 mm (\u226515.5)"
+      ],
+      "flags": []
+    },
+    "domain_d_tilt": {
+      "value": 33.5694,
+      "category": "Abnormal",
+      "verdict": "Patellar tilt abnormal (Sallay \u226520\u00b0)",
+      "confidence": "High",
+      "drivers": [
+        "Tilt 33.57\u00b0 (\u226520)"
+      ],
+      "flags": []
+    },
+    "phenotype": {
+      "schema_version": "v2.0",
+      "pfi_risk": "Severe",
+      "positive_domains": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "drivers": [
+        "Likely Alta",
+        "Trochlear dysplasia",
+        "Lateralization (PT-TG)",
+        "Patellar tilt"
+      ],
+      "flags": [],
+      "recommendation": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration."
+    }
+  }
 }
