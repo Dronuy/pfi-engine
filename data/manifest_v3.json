@@ -1,0 +1,62 @@
+{
+  "version": "3.0",
+  "title": "PFI Engine \u2014 Patellofemoral Instability Assessment",
+  "tagline": "Automated quantitative assessment of patellofemoral instability from knee MRI.",
+  "disclaimer": "FOR RESEARCH USE ONLY. Not for clinical diagnosis. Not FDA-cleared, not CE-marked. Data shown is from pre-computed test cases on the publicly available fastMRI dataset.",
+  "about": "Pre-research-use prototype. Computes 14 literature-validated indices across patellar height, trochlear morphology, lateralization, and patellar tilt domains. Reports composite phenotype using cartilage-based MRI conventions per Tanaka 2023, Biedert 2006, and Pfirrmann 2000.",
+  "methodology_placeholder": "Methodology details to appear with published validation paper [Skeletal Radiology, in preparation].",
+  "citations": [
+    "Insall J, Salvati E. Patella position in the normal knee joint. Radiology 1971.",
+    "Caton J et al. Methodes de mesure de la hauteur de la rotule. Rev Chir Orthop 1982.",
+    "Biedert RM, Albrecht S. The patellotrochlear index. KSSTA 2006.",
+    "Carrillon Y et al. Patellar instability: assessment on MR images. Radiology 2000.",
+    "Pfirrmann CWA et al. Femoral trochlear dysplasia: MR findings. Radiology 2000.",
+    "Tanaka MJ et al. The cartilaginous trochlea in patients with patellofemoral instability. AJSM 2023.",
+    "Sallay PI et al. Acute dislocation of the patella. KSSTA 1996 / Brattstr\u00f6m H 1964.",
+    "Hinckel BB et al. Patellar tendon-trochlear groove distance. JFM 2015.",
+    "Barbosa RM et al. Reliability of trochlear dysplasia indices on MRI. Skeletal Radiol 2024."
+  ],
+  "cases": [
+    {
+      "case_name": "case_normal",
+      "headline": "Normal",
+      "summary": "Healthy patellofemoral anatomy across all four domains.",
+      "composite_phenotype": "Normal",
+      "iop_laterality": "L"
+    },
+    {
+      "case_name": "case_alta_confirmed",
+      "headline": "Severe Alta",
+      "summary": "Patella alta confirmed across all three patellar-height indices.",
+      "composite_phenotype": "Severe",
+      "iop_laterality": "R"
+    },
+    {
+      "case_name": "case_anatomic_variant",
+      "headline": "Anatomic variant",
+      "summary": "Long non-articular patellar pole inflates IS index; CDI and PTI normal.",
+      "composite_phenotype": "Mild",
+      "iop_laterality": "R"
+    },
+    {
+      "case_name": "case_severe_dysplasia",
+      "headline": "Severe PFI",
+      "summary": "Multi-domain PFI: alta + trochlear dysplasia + tilt + lateralization.",
+      "composite_phenotype": "Severe",
+      "iop_laterality": "R"
+    },
+    {
+      "case_name": "case_early_dysplasia",
+      "headline": "Early dysplasia",
+      "summary": "Cartilaginous trochlea dysplastic, underlying bone normal.",
+      "composite_phenotype": "Moderate",
+      "iop_laterality": "L"
+    }
+  ],
+  "phenotype_recommendations": {
+    "Normal": "No PFI features identified. No specific imaging follow-up indicated.",
+    "Mild": "Single-domain finding. Clinical correlation suggested.",
+    "Moderate": "Multiple PFI features. MSK or sports-medicine consult suggested if symptomatic.",
+    "Severe": "Severe PFI features across multiple domains. MSK fellowship referral and surgical workup consideration."
+  }
+}

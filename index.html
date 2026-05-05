@@ -3,533 +3,520 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PFI Analysis Engine</title>
+<title>PFI Engine — Patellofemoral Instability Assessment</title>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg: #1a1a1a; --bg2: #242424; --bg3: #2e2e2e;
-  --text: #e0e0e0; --text2: #999;
-  --green: #4CAF50; --yellow: #FFC107; --red: #F44336;
+  --bg: #1a1a1a; --bg2: #242424; --bg3: #2e2e2e; --bg4: #383838;
+  --text: #e0e0e0; --text2: #999; --text3: #666;
+  --green: #4CAF50; --yellow: #FFC107; --orange: #FF9800; --red: #F44336;
   --blue: #2196F3; --accent: #00BCD4;
+  --border: #3a3a3a;
 }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; user-select: none; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; line-height: 1.5; }
 
-/* Layout — fixed panels, no reflow on analysis */
-#app { display: flex; flex-direction: column; height: 100vh; }
-#viewer-row { display: flex; flex: 1; min-height: 0; }
-#sag-panel { flex: 0 0 60%; position: relative; background: #000; overflow: hidden; border-right: 1px solid #333; }
-#ax-panel { flex: 0 0 40%; position: relative; background: #000; overflow: hidden; }
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+header { background: var(--bg2); padding: 16px 24px; border-bottom: 1px solid var(--border); }
+header h1 { font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; }
+header .tagline { font-size: 13px; color: var(--text2); margin-top: 3px; }
+header .disclaimer { display: inline-block; margin-top: 8px; padding: 4px 10px; background: rgba(244,67,54,0.12); border: 1px solid rgba(244,67,54,0.3); color: #ff8a80; font-size: 11px; border-radius: 4px; letter-spacing: 0.3px; }
 
-/* Viewer images — fill panel, maintain aspect ratio */
-.viewer-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: auto; transition: filter 0.05s; }
-.panel-label { position: absolute; top: 10px; left: 12px; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 600; letter-spacing: 0.5px; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
-.slice-counter { position: absolute; top: 10px; right: 12px; font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; font-variant-numeric: tabular-nums; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
-.no-data-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #555; font-size: 14px; }
+/* ── Layout grid ─────────────────────────────────────────────────────── */
+main { max-width: 1280px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 16px; gap: 16px; } }
 
-/* Study selector bar */
-#study-bar { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg2); border-top: 1px solid #333; flex-shrink: 0; }
-#study-bar .bar-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-right: 8px; white-space: nowrap; }
-.study-btn { padding: 7px 16px; border: 1px solid #444; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-.study-btn:hover { border-color: var(--accent); color: #fff; }
-.study-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-.study-btn .conf-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+/* ── Case selector (left rail) ───────────────────────────────────────── */
+#cases { display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 900px) { #cases { flex-direction: row; overflow-x: auto; padding-bottom: 8px; } }
+.case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.15s; flex-shrink: 0; min-width: 200px; }
+.case-card:hover { border-color: var(--accent); }
+.case-card.active { border-color: var(--accent); background: var(--bg3); }
+.case-card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.case-card .headline { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.case-card .summary { font-size: 12px; color: var(--text2); line-height: 1.4; }
+.case-card .badge { display: inline-block; margin-top: 8px; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; }
 
-/* Loading bar */
-#load-bar-container { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(0,0,0,0.5); z-index: 20; display: none; }
-#load-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s; }
+/* ── Main view ───────────────────────────────────────────────────────── */
+#main-view { min-width: 0; }
+#welcome { background: var(--bg2); padding: 24px; border-radius: 8px; border: 1px solid var(--border); }
+#welcome h2 { font-size: 16px; margin-bottom: 12px; color: var(--accent); }
+#welcome p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.placeholder-link { color: var(--text3); font-style: italic; font-size: 12px; }
 
-/* PFI Overlay — fixed position, never affects layout */
-#pfi-overlay { position: fixed; bottom: 56px; left: 16px; width: 320px; background: rgba(26,26,26,0.95); border: 1px solid #444; border-radius: 12px; z-index: 50; backdrop-filter: blur(8px); overflow: hidden; transition: max-height 0.3s ease; max-height: 500px; }
-#pfi-overlay.collapsed { max-height: 42px; }
-#pfi-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #333; }
-#pfi-header h3 { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; }
-#pfi-header .chevron { color: var(--text2); font-size: 12px; transition: transform 0.2s; }
-#pfi-overlay.collapsed .chevron { transform: rotate(-90deg); }
-#pfi-body { padding: 14px 16px; }
+#case-view { display: none; }
+.composite-card { background: var(--bg2); border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
+.composite-card .composite-headline { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; }
+.composite-card .composite-badge { display: inline-block; margin-top: 8px; padding: 8px 18px; font-size: 18px; font-weight: 700; border-radius: 6px; letter-spacing: 0.5px; }
+.composite-card .composite-rec { margin-top: 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
 
-/* Analyze button */
-#analyze-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-#analyze-btn:hover { background: #00a5b5; }
-#analyze-btn:disabled { background: #444; color: #888; cursor: default; }
-#analyze-btn .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
-#analyze-btn.loading .spinner { display: inline-block; }
-#analyze-btn.loading .btn-text { display: none; }
-#analyze-btn.loading .btn-loading-text { display: inline; }
-#analyze-btn .btn-loading-text { display: none; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ── Domain panels (accordion) ──────────────────────────────────────── */
+.domain-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.domain-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; transition: background 0.15s; }
+.domain-header:hover { background: var(--bg3); }
+.domain-header h3 { font-size: 15px; font-weight: 600; }
+.domain-header .right { display: flex; align-items: center; gap: 12px; }
+.domain-header .domain-verdict { font-size: 12px; padding: 3px 10px; border-radius: 3px; font-weight: 600; }
+.domain-header .chevron { color: var(--text2); font-size: 11px; transition: transform 0.2s; }
+.domain-panel.expanded .chevron { transform: rotate(180deg); }
+.domain-body { display: none; padding: 12px 18px 18px; border-top: 1px solid var(--border); background: var(--bg); }
+.domain-panel.expanded .domain-body { display: block; }
 
-/* Results */
-#results-panel { display: none; margin-top: 14px; animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.result-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
-.result-label { font-size: 12px; color: var(--text2); }
-.result-value { font-size: 13px; font-weight: 600; }
-.result-cat { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-.cat-normal { background: rgba(76,175,80,0.15); color: var(--green); }
-.cat-borderline { background: rgba(255,193,7,0.15); color: var(--yellow); }
-.cat-abnormal { background: rgba(244,67,54,0.15); color: var(--red); }
-.divider { height: 1px; background: #333; margin: 10px 0; }
-.conclusion-text { font-size: 18px; font-weight: 700; margin: 4px 0; }
-.confidence-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
-.confidence-dot { width: 8px; height: 8px; border-radius: 50%; }
-.confidence-label { font-size: 12px; color: var(--text2); }
-.note-text { font-size: 11px; color: var(--text2); margin-top: 6px; line-height: 1.4; font-style: italic; }
+/* ── Index cards ─────────────────────────────────────────────────────── */
+.index-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+.index-card .row1 { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.index-card .name { font-size: 13px; font-weight: 600; }
+.index-card .ref { font-size: 10px; color: var(--text3); margin-top: 2px; letter-spacing: 0.3px; }
+.index-card .right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.index-card .value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.index-card .verdict { font-size: 11px; padding: 3px 9px; border-radius: 3px; font-weight: 600; letter-spacing: 0.3px; }
+.index-card .threshold { font-size: 11px; color: var(--text2); margin-top: 6px; }
 
-/* Action buttons row */
-.action-row { display: flex; gap: 6px; margin-top: 12px; }
-.action-btn { flex: 1; padding: 7px 10px; border: 1px solid #444; border-radius: 6px; background: var(--bg3); color: var(--text); font-size: 11px; cursor: pointer; text-align: center; transition: all 0.15s; }
-.action-btn:hover { border-color: var(--accent); }
-.action-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.action-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+/* Verdict colours */
+.v-normal     { background: rgba(76,175,80,0.15);  color: var(--green); }
+.v-borderline { background: rgba(255,193,7,0.15);  color: var(--yellow); }
+.v-abnormal   { background: rgba(244,67,54,0.15);  color: var(--red); }
+.v-info       { background: rgba(33,150,243,0.15); color: var(--blue); }
 
-/* Viewer wrapper — full panel fill */
-.viewer-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+/* Composite phenotype colours */
+.comp-Normal   { background: rgba(76,175,80,0.18);  color: var(--green);  border: 1px solid rgba(76,175,80,0.35); }
+.comp-Mild     { background: rgba(255,193,7,0.18);  color: var(--yellow); border: 1px solid rgba(255,193,7,0.35); }
+.comp-Moderate { background: rgba(255,152,0,0.18);  color: var(--orange); border: 1px solid rgba(255,152,0,0.35); }
+.comp-Severe   { background: rgba(244,67,54,0.18);  color: var(--red);    border: 1px solid rgba(244,67,54,0.35); }
+
+/* ── Discordance flags section ───────────────────────────────────────── */
+.flags-section { background: var(--bg2); border: 1px solid rgba(33,150,243,0.35); border-radius: 8px; padding: 16px; margin-top: 16px; }
+.flags-section h3 { font-size: 14px; color: var(--blue); margin-bottom: 10px; }
+.flag-card { background: rgba(33,150,243,0.08); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 4px; margin-bottom: 8px; }
+.flag-card .flag-title { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
+.flag-card .flag-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+/* ── Internal verification (de-emphasized) ──────────────────────────── */
+.internal-section { margin-top: 16px; padding: 12px 16px; background: var(--bg2); border: 1px dashed var(--text3); border-radius: 6px; }
+.internal-section h3 { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+.internal-section .label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-style: italic; }
+.internal-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.internal-row .iname { color: var(--text2); }
+.internal-row .ival { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* ── Generate report button + modal ────────────────────────────────── */
+#report-btn { width: 100%; padding: 12px; margin-top: 16px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+#report-btn:hover { background: #00a5b5; }
+
+#modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+#modal-bg.show { display: flex; }
+.modal-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; max-width: 720px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.modal-header h3 { font-size: 15px; }
+.modal-header .close { cursor: pointer; color: var(--text2); font-size: 22px; padding: 4px 10px; border-radius: 4px; }
+.modal-header .close:hover { background: var(--bg3); color: var(--text); }
+.modal-body { padding: 18px; overflow-y: auto; }
+.modal-body pre { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--text); white-space: pre-wrap; word-break: break-all; }
+.modal-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.btn-secondary { padding: 8px 16px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg3); color: var(--text); font-size: 12px; cursor: pointer; }
+.btn-secondary:hover { border-color: var(--accent); }
+.btn-secondary.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+footer { padding: 24px; text-align: center; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border); margin-top: 32px; }
+footer a { color: var(--text2); }
+.cite-list { margin-top: 12px; font-size: 10px; color: var(--text3); }
+.cite-list ul { list-style: none; padding: 0; }
+.cite-list li { padding: 2px 0; }
 </style>
 </head>
 <body>
-<div id="app">
-  <div id="viewer-row">
-    <div id="sag-panel">
-      <div class="panel-label">SAG</div>
-      <div class="slice-counter" id="sag-counter">-</div>
-      <div class="viewer-wrapper" id="sag-wrapper">
-        <img class="viewer-img" id="sag-img" alt="">
-        <span class="no-data-msg" id="sag-placeholder">Select a study</span>
-      </div>
-      <div id="load-bar-container"><div id="load-bar"></div></div>
+
+<header>
+  <h1 id="title">PFI Engine — Patellofemoral Instability Assessment</h1>
+  <div class="tagline" id="tagline">…</div>
+  <span class="disclaimer" id="disclaimer">…</span>
+</header>
+
+<main>
+  <aside id="cases"></aside>
+
+  <section id="main-view">
+    <div id="welcome">
+      <h2>About this demo</h2>
+      <p id="about">…</p>
+      <p class="placeholder-link" id="methodology">…</p>
     </div>
-    <div id="ax-panel">
-      <div class="panel-label">AX</div>
-      <div class="slice-counter" id="ax-counter">-</div>
-      <div class="viewer-wrapper" id="ax-wrapper">
-        <img class="viewer-img" id="ax-img" alt="">
-        <span class="no-data-msg" id="ax-placeholder">-</span>
-      </div>
+    <div id="case-view"></div>
+  </section>
+</main>
+
+<div id="modal-bg" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Generated report</h3>
+      <span class="close" onclick="closeModal()">&times;</span>
     </div>
-  </div>
-  <div id="study-bar">
-    <span class="bar-label">Study</span>
-    <div id="study-buttons"></div>
+    <div class="modal-body"><pre id="report-text"></pre></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="copy-btn" onclick="copyReport()">Copy to clipboard</button>
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+    </div>
   </div>
 </div>
-<div id="pfi-overlay">
-  <div id="pfi-header" onclick="toggleOverlay()">
-    <h3>PFI Analysis Engine v1.0</h3>
-    <span class="chevron">&#9660;</span>
-  </div>
-  <div id="pfi-body">
-    <button id="analyze-btn" onclick="runAnalysis()" disabled>
-      <span class="spinner"></span>
-      <span class="btn-text">Analyze</span>
-      <span class="btn-loading-text">Analyzing...</span>
-    </button>
-    <div id="results-panel"></div>
-  </div>
-</div>
+
+<footer>
+  <div>FOR RESEARCH USE ONLY · Pre-publication prototype · Public test cases from <a href="https://fastmri.med.nyu.edu/" target="_blank">fastMRI dataset</a></div>
+  <div class="cite-list" id="cite-list"></div>
+</footer>
 
 <script>
-const BASE = 'https://mxbtvxbgeyuzffmutauy.supabase.co/storage/v1/object/public/images/pfi-demo';
-
-// State
+const DEMO_BASE = 'data';        // local relative path; can be replaced with a CDN base
 let manifest = null;
 let currentCase = null;
-let caseData = {};   // case_name -> { results, sagImgs[], axImgs[], annotatedImg }
-let sagIdx = 0, axIdx = 0;
-let showingAnnotated = false;
+let caseData = {};
 
-// Window/level state
-let wlActive = false, wlStartX = 0, wlStartY = 0;
-let brightness = 100, contrast = 100;
-// Pan state
-let panActive = false, panStartX = 0, panStartY = 0;
-let panX = 0, panY = 0, panBaseX = 0, panBaseY = 0;
-// Zoom
-let zoom = 1;
-
-const CASE_LABELS = {
-  case_normal: 'Normal',
-  case_alta: 'Alta',
-  case_discordant: 'Discordant',
-  case_borderline: 'Borderline',
-  case_baja: 'Baja'
+const VERDICT_COLOURS = {
+  Normal: 'v-normal', 'Borderline Alta': 'v-borderline', 'Borderline Baja': 'v-borderline',
+  Alta: 'v-abnormal', Baja: 'v-abnormal',
 };
 
-// Init
 async function init() {
-  const resp = await fetch(`${BASE}/manifest.json`);
-  manifest = await resp.json();
-  buildStudyBar();
-  setupViewerEvents();
-  // Auto-select first
-  selectCase(manifest.cases[0].case_name);
-}
+  const res = await fetch(`${DEMO_BASE}/manifest_v3.json`);
+  manifest = await res.json();
+  document.getElementById('title').textContent      = manifest.title;
+  document.getElementById('tagline').textContent    = manifest.tagline;
+  document.getElementById('disclaimer').textContent = manifest.disclaimer;
+  document.getElementById('about').textContent      = manifest.about;
+  document.getElementById('methodology').textContent = manifest.methodology_placeholder;
 
-function buildStudyBar() {
-  const container = document.getElementById('study-buttons');
-  container.style.display = 'flex';
-  container.style.gap = '6px';
+  // Citations
+  const cl = document.getElementById('cite-list');
+  cl.innerHTML = '<strong>Literature references</strong><ul>' +
+    manifest.citations.map(c => `<li>· ${c}</li>`).join('') +
+    '</ul>';
+
+  // Cases sidebar
+  const aside = document.getElementById('cases');
   manifest.cases.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'study-btn';
-    btn.dataset.case = c.case_name;
-    const confColor = c.confidence === 'High' ? 'var(--green)' : c.confidence === 'Moderate' ? 'var(--yellow)' : 'var(--red)';
-    btn.innerHTML = `${CASE_LABELS[c.case_name]}<span class="conf-dot" style="background:${confColor}"></span>`;
-    btn.title = c.description;
-    btn.onclick = () => selectCase(c.case_name);
-    container.appendChild(btn);
+    const div = document.createElement('div');
+    div.className = 'case-card';
+    div.dataset.case = c.case_name;
+    const compCls = `comp-${c.composite_phenotype}`;
+    div.innerHTML = `
+      <div class="label">Case</div>
+      <div class="headline">${c.headline}</div>
+      <div class="summary">${c.summary}</div>
+      <span class="badge ${compCls}">${c.composite_phenotype}</span>
+    `;
+    div.onclick = () => selectCase(c.case_name);
+    aside.appendChild(div);
   });
+
+  if (manifest.cases.length) selectCase(manifest.cases[0].case_name);
 }
 
-async function selectCase(caseName) {
-  if (currentCase === caseName) return;
-  currentCase = caseName;
-  showingAnnotated = false;
-
-  // Update buttons
-  document.querySelectorAll('.study-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.case === caseName);
-  });
-
-  // Reset analysis
-  document.getElementById('results-panel').style.display = 'none';
-  document.getElementById('results-panel').innerHTML = '';
-  const btn = document.getElementById('analyze-btn');
-  btn.classList.remove('loading');
-  btn.disabled = true;
-  btn.querySelector('.btn-text').textContent = 'Analyze';
-
-  // Reset view
-  brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
-  applyTransform('sag'); applyTransform('ax');
-
-  // Load data if not cached
-  if (!caseData[caseName]) {
-    await loadCaseData(caseName);
+async function selectCase(name) {
+  currentCase = name;
+  document.querySelectorAll('.case-card').forEach(c =>
+    c.classList.toggle('active', c.dataset.case === name));
+  if (!caseData[name]) {
+    const res = await fetch(`${DEMO_BASE}/${name}/index_v3.json`);
+    caseData[name] = await res.json();
   }
-
-  const data = caseData[caseName];
-  sagIdx = data.results.best_slice_index;
-  axIdx = Math.floor((data.axImgs.length || 1) / 2);
-  showSlice('sag');
-  showSlice('ax');
-  btn.disabled = false;
+  renderCase(caseData[name]);
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('case-view').style.display = 'block';
 }
 
-async function loadCaseData(caseName) {
-  const info = manifest.cases.find(c => c.case_name === caseName);
-  const loadBar = document.getElementById('load-bar-container');
-  const bar = document.getElementById('load-bar');
-  loadBar.style.display = 'block';
-  bar.style.width = '0%';
+function verdictForCart(v, cutoff, op, lo, hi) {
+  // 3-tier verdict where cart screening uses Tanaka 3-tier (Normal/Borderline/Abnormal).
+  // Borderline thresholds are conservative (within +/-1 unit of cutoff).
+  if (v === null || v === undefined) return ['—', 'v-info'];
+  const passes = (op === 'ge') ? v >= cutoff : v <= cutoff;
+  if (passes) return ['Abnormal', 'v-abnormal'];
+  // Borderline if within margin
+  const margin = Math.abs(cutoff) * 0.05 + 1.0;   // generic 5% relative or 1 abs unit
+  if ((op === 'ge' && v >= cutoff - margin) || (op === 'le' && v <= cutoff + margin)) {
+    return ['Borderline', 'v-borderline'];
+  }
+  return ['Normal', 'v-normal'];
+}
 
-  // Load results.json
-  const res = await fetch(`${BASE}/${caseName}/results.json`);
-  const results = await res.json();
+function categoryClass(cat) {
+  if (!cat) return 'v-info';
+  if (cat === 'Normal') return 'v-normal';
+  if (cat.includes('Borderline')) return 'v-borderline';
+  return 'v-abnormal';
+}
 
-  // Load annotated
-  const annotatedImg = new Image();
-  const annotatedPromise = new Promise(resolve => {
-    annotatedImg.onload = resolve;
-    annotatedImg.onerror = resolve;
-    annotatedImg.src = `${BASE}/${caseName}/annotated.png`;
-  });
+function renderCase(c) {
+  const v = document.getElementById('case-view');
+  const composite = c.composite_phenotype || 'Normal';
+  const recText = (manifest.phenotype_recommendations || {})[composite] || '';
 
-  // Preload SAG slices
-  const nSag = info.n_slices_sag;
-  const nAx = info.n_slices_ax;
-  const total = nSag + nAx + 1;
-  let loaded = 0;
+  let html = `
+    <div class="composite-card">
+      <div class="composite-headline">Composite phenotype</div>
+      <span class="composite-badge comp-${composite}">${composite}</span>
+      <div class="composite-rec">${recText}</div>
+    </div>`;
 
-  function tick() {
-    loaded++;
-    bar.style.width = `${(loaded / total) * 100}%`;
+  // Domain A — Patellar Height
+  const ph = c.patellar_height || {};
+  const ph_comp = c.patellar_height_composite || 'normal';
+  const phVerdict = ph_comp === 'normal' ? ['Normal', 'v-normal']
+                   : ph_comp.includes('borderline') ? ['Borderline', 'v-borderline']
+                   : ['Abnormal', 'v-abnormal'];
+  html += panelHtml('A — Patellar Height', phVerdict, [
+    indexCardHtml('Insall-Salvati index', ph.IS, 'IS'),
+    indexCardHtml('Caton-Deschamps index', ph.CDI, 'CDI'),
+    indexCardHtml('Patellotrochlear index', ph.PTI, 'PTI'),
+  ]);
+
+  // Domain B — Trochlear Morphology
+  const td = c.trochlear_dysplasia || {};
+  const grade = td.composite_grade || 'no_dysplasia';
+  const tdVerdict = grade === 'no_dysplasia' ? ['No dysplasia', 'v-normal']
+                   : grade === 'low_grade'   ? ['Low grade', 'v-borderline']
+                   : grade === 'moderate'    ? ['Moderate', 'v-borderline']
+                                              : ['High grade', 'v-abnormal'];
+  const cs = td.cart_screening || {};
+  const bc = td.bone_convention || {};
+  html += panelHtml('B — Trochlear Morphology (cart-primary, bone corroboration)', tdVerdict, [
+    `<div style="font-size:12px;color:var(--text2);margin:8px 0 6px;font-weight:600;letter-spacing:0.5px;">Cart screening (Tanaka 2023)</div>`,
+    indexCardHtmlGeneric('Cart Sulcus Angle (SA)',  cs.Cart_SA,  'deg'),
+    indexCardHtmlGeneric('Cart Lateral Trochlear Inclination (LTI)', cs.Cart_LTI, 'deg'),
+    indexCardHtmlGeneric('Cart Trochlear Depth (TD)', cs.Cart_TD, 'mm'),
+    `<div style="font-size:12px;color:var(--text2);margin:14px 0 6px;font-weight:600;letter-spacing:0.5px;">Bone corroboration (Pfirrmann / Carrillon)</div>`,
+    indexCardHtmlGeneric('Bone Sulcus Angle',  bc.Bone_SA,  'deg'),
+    indexCardHtmlGeneric('Bone Lateral Trochlear Inclination', bc.Bone_LTI, 'deg'),
+    indexCardHtmlGeneric('Bone Trochlear Depth', bc.Bone_TD, 'mm'),
+    indexCardHtmlGeneric('Bone Trochlear Facet Asymmetry', bc.Bone_TFA, 'ratio'),
+  ]);
+
+  // Domain C — Lateralization
+  const lat = c.lateralization || {};
+  const latPheno = lat.phenotype || 'normal';
+  const latVerdict = latPheno === 'lateralized' ? ['Lateralized', 'v-abnormal']
+                                                  : ['Normal', 'v-normal'];
+  html += panelHtml('C — Lateralization', latVerdict, [
+    indexCardHtmlGeneric('Patellar Tendon - Trochlear Groove (PT-TG)', lat, 'mm'),
+  ]);
+
+  // Domain D — Patellar Tilt
+  const pt = c.patellar_tilt || {};
+  const ptPheno = pt.phenotype || 'normal';
+  const ptVerdict = ptPheno === 'tilted' ? ['Tilted', 'v-abnormal'] : ['Normal', 'v-normal'];
+  html += panelHtml('D — Patellar Tilt', ptVerdict, [
+    indexCardHtmlGeneric('Patellar Tilt angle', pt, 'deg'),
+  ]);
+
+  // Discordance flags
+  if (c.discordance_flags && c.discordance_flags.length) {
+    html += `<div class="flags-section">
+      <h3>📌 Discordance flags</h3>
+      ${c.discordance_flags.map(f => `
+        <div class="flag-card">
+          <div class="flag-title">${f.title}</div>
+          <div class="flag-text">${f.text}</div>
+        </div>`).join('')}
+    </div>`;
   }
 
-  const sagImgs = [];
-  const sagPromises = [];
-  for (let i = 1; i <= nSag; i++) {
-    const img = new Image();
-    const p = new Promise(resolve => {
-      img.onload = () => { tick(); resolve(); };
-      img.onerror = () => { tick(); resolve(); };
+  // Internal verification (de-emphasized)
+  const iv = c.internal_verification || {};
+  if (iv.Cart_TFA || iv.sPT_TG_cart) {
+    html += `<div class="internal-section">
+      <h3>Internal verification (supplementary)</h3>
+      <div class="label">Computed for internal consistency only — not primary screening output.</div>`;
+    if (iv.Cart_TFA && iv.Cart_TFA.value !== undefined && iv.Cart_TFA.value !== null) {
+      html += `<div class="internal-row"><span class="iname">Cart-TFA (cart-bone consistency check)</span><span class="ival">${formatVal(iv.Cart_TFA.value, 'ratio')}</span></div>`;
+    }
+    if (iv.sPT_TG_cart && iv.sPT_TG_cart.value !== undefined && iv.sPT_TG_cart.value !== null) {
+      html += `<div class="internal-row"><span class="iname">Signed PT-TG (AP-axis check)</span><span class="ival">${formatVal(iv.sPT_TG_cart.value, 'mm')}</span></div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `<button id="report-btn" onclick="generateReport()">Generate text report</button>`;
+
+  v.innerHTML = html;
+
+  // Bind accordion
+  document.querySelectorAll('.domain-header').forEach(h => {
+    h.onclick = () => h.parentElement.classList.toggle('expanded');
+  });
+  // Auto-expand all panels by default for the demo
+  document.querySelectorAll('.domain-panel').forEach(p => p.classList.add('expanded'));
+}
+
+function panelHtml(title, verdict, body) {
+  const [vText, vCls] = verdict;
+  const inner = Array.isArray(body) ? body.join('') : body;
+  return `<div class="domain-panel expanded">
+    <div class="domain-header">
+      <h3>${title}</h3>
+      <div class="right">
+        <span class="domain-verdict ${vCls}">${vText}</span>
+        <span class="chevron">▾</span>
+      </div>
+    </div>
+    <div class="domain-body">${inner}</div>
+  </div>`;
+}
+
+function indexCardHtml(name, idx, key) {
+  if (!idx) return '';
+  const cat = idx.category || '—';
+  const cls = categoryClass(cat);
+  const ref = idx.reference || '';
+  const v   = formatVal(idx.value, '');
+  const tA  = idx.cutoff_alta;
+  const tB  = idx.cutoff_baja;
+  const ths = `Alta &gt; ${tA} · Baja &lt; ${tB}`;
+  return `<div class="index-card">
+    <div class="row1">
+      <div>
+        <div class="name">${name}</div>
+        <div class="ref">${ref}</div>
+      </div>
+      <div class="right">
+        <span class="value">${v}</span>
+        <span class="verdict ${cls}">${cat}</span>
+      </div>
+    </div>
+    <div class="threshold">Thresholds: ${ths}</div>
+  </div>`;
+}
+
+function indexCardHtmlGeneric(name, idx, unit) {
+  if (!idx) return '';
+  const v = idx.value;
+  if (v === undefined || v === null) {
+    return `<div class="index-card">
+      <div class="row1">
+        <div><div class="name">${name}</div></div>
+        <div class="right"><span class="verdict v-info">N/A</span></div>
+      </div></div>`;
+  }
+  const cutoff = idx.cutoff;
+  const op = idx.op || 'ge';
+  const [vText, vCls] = verdictForCart(v, cutoff, op);
+  const ref = idx.reference || '';
+  const opSym = op === 'ge' ? '&ge;' : '&le;';
+  const ths = `Threshold: ${opSym} ${cutoff}`;
+  return `<div class="index-card">
+    <div class="row1">
+      <div>
+        <div class="name">${name}</div>
+        <div class="ref">${ref}</div>
+      </div>
+      <div class="right">
+        <span class="value">${formatVal(v, unit)}</span>
+        <span class="verdict ${vCls}">${vText}</span>
+      </div>
+    </div>
+    <div class="threshold">${ths} ${unit ? `(${unit})` : ''}</div>
+  </div>`;
+}
+
+function formatVal(v, unit) {
+  if (v === null || v === undefined) return '—';
+  let s;
+  if (typeof v === 'number') {
+    if (Math.abs(v) < 1) s = v.toFixed(3);
+    else if (Math.abs(v) < 10) s = v.toFixed(2);
+    else s = v.toFixed(1);
+  } else s = String(v);
+  if (unit && unit !== 'ratio') s += ` ${unit}`;
+  return s;
+}
+
+function generateReport() {
+  const c = caseData[currentCase];
+  if (!c) return;
+  const lines = [];
+  lines.push(`PATELLOFEMORAL INSTABILITY ASSESSMENT (automated)`);
+  lines.push(``);
+  lines.push(`Case label : ${(manifest.cases.find(x => x.case_name === currentCase) || {}).headline || currentCase}`);
+  lines.push(`Composite phenotype : ${c.composite_phenotype || '?'}`);
+  lines.push(``);
+  // Patellar Height
+  lines.push(`PATELLAR HEIGHT`);
+  const ph = c.patellar_height || {};
+  ['IS','CDI','PTI'].forEach(k => {
+    const i = ph[k];
+    if (!i) return;
+    lines.push(`  ${k.padEnd(4)} : ${formatVal(i.value,'')}  (${i.category || '—'})  [${i.reference}]`);
+  });
+  lines.push(`  Composite : ${c.patellar_height_composite}`);
+  lines.push(``);
+  // Trochlear
+  lines.push(`TROCHLEAR MORPHOLOGY`);
+  const td = c.trochlear_dysplasia || {};
+  const cs = td.cart_screening || {};
+  const bc = td.bone_convention || {};
+  lines.push(`  Cart screening (Tanaka 2023):`);
+  ['Cart_SA','Cart_LTI','Cart_TD'].forEach(k => {
+    const i = cs[k]; if (!i) return;
+    lines.push(`    ${k.padEnd(8)} = ${formatVal(i.value,'')}  threshold ${i.op === 'ge' ? '>=' : '<='} ${i.cutoff}`);
+  });
+  lines.push(`  Bone corroboration (Pfirrmann / Carrillon):`);
+  ['Bone_SA','Bone_LTI','Bone_TD','Bone_TFA'].forEach(k => {
+    const i = bc[k]; if (!i) return;
+    lines.push(`    ${k.padEnd(8)} = ${formatVal(i.value,'')}  threshold ${i.op === 'ge' ? '>=' : '<='} ${i.cutoff}`);
+  });
+  lines.push(`  Composite grade : ${td.composite_grade}`);
+  lines.push(``);
+  // Lateralization + tilt
+  const lat = c.lateralization || {};
+  if (lat.value !== undefined) {
+    lines.push(`LATERALIZATION (Hinckel 2015 PT-TG)`);
+    lines.push(`  Value : ${formatVal(lat.value,'mm')}  threshold >= ${lat.cutoff} mm  -> ${lat.phenotype}`);
+    lines.push(``);
+  }
+  const pt = c.patellar_tilt || {};
+  if (pt.value !== undefined) {
+    lines.push(`PATELLAR TILT (Sallay 1996)`);
+    lines.push(`  Value : ${formatVal(pt.value,'deg')}  threshold >= ${pt.cutoff} deg  -> ${pt.phenotype}`);
+    lines.push(``);
+  }
+  // Flags
+  if (c.discordance_flags && c.discordance_flags.length) {
+    lines.push(`FLAGS:`);
+    c.discordance_flags.forEach(f => {
+      lines.push(`  - ${f.title}`);
+      lines.push(`    ${f.text}`);
     });
-    img.src = `${BASE}/${caseName}/sag/${String(i).padStart(3, '0')}.png`;
-    sagImgs.push(img);
-    sagPromises.push(p);
+    lines.push(``);
   }
-
-  const axImgs = [];
-  const axPromises = [];
-  for (let i = 1; i <= nAx; i++) {
-    const img = new Image();
-    const p = new Promise(resolve => {
-      img.onload = () => { tick(); resolve(); };
-      img.onerror = () => { tick(); resolve(); };
-    });
-    img.src = `${BASE}/${caseName}/ax/${String(i).padStart(3, '0')}.png`;
-    axImgs.push(img);
-    axPromises.push(p);
+  // Recommendation
+  const rec = (manifest.phenotype_recommendations || {})[c.composite_phenotype];
+  if (rec) {
+    lines.push(`RECOMMENDATION : ${rec}`);
+    lines.push(``);
   }
-
-  await Promise.all([...sagPromises, ...axPromises, annotatedPromise]);
-  tick();
-
-  caseData[caseName] = { results, sagImgs, axImgs, annotatedImg };
-
-  bar.style.width = '100%';
-  setTimeout(() => { loadBar.style.display = 'none'; }, 300);
+  lines.push(`---`);
+  lines.push(`FOR RESEARCH USE ONLY. Pre-publication prototype.`);
+  document.getElementById('report-text').textContent = lines.join('\n');
+  document.getElementById('modal-bg').classList.add('show');
 }
 
-function showSlice(panel) {
-  const data = caseData[currentCase];
-  if (!data) return;
-
-  if (panel === 'sag') {
-    const img = document.getElementById('sag-img');
-    const placeholder = document.getElementById('sag-placeholder');
-    if (showingAnnotated) {
-      img.src = data.annotatedImg.src;
-      document.getElementById('sag-counter').textContent = `BEST (${data.results.best_slice_index + 1}/${data.sagImgs.length})`;
-    } else if (data.sagImgs.length > 0) {
-      const idx = Math.max(0, Math.min(sagIdx, data.sagImgs.length - 1));
-      sagIdx = idx;
-      img.src = data.sagImgs[idx].src;
-      document.getElementById('sag-counter').textContent = `${idx + 1} / ${data.sagImgs.length}`;
-    }
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-    applyTransform('sag');
-  } else {
-    const img = document.getElementById('ax-img');
-    const placeholder = document.getElementById('ax-placeholder');
-    if (data.axImgs.length > 0) {
-      const idx = Math.max(0, Math.min(axIdx, data.axImgs.length - 1));
-      axIdx = idx;
-      img.src = data.axImgs[idx].src;
-      img.style.display = 'block';
-      placeholder.style.display = 'none';
-      document.getElementById('ax-counter').textContent = `${idx + 1} / ${data.axImgs.length}`;
-    } else {
-      img.style.display = 'none';
-      placeholder.style.display = 'block';
-      placeholder.textContent = 'No AX series';
-      document.getElementById('ax-counter').textContent = '-';
-    }
-    applyTransform('ax');
-  }
-}
-
-function applyTransform(panel) {
-  const img = document.getElementById(`${panel}-img`);
-  img.style.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
-  img.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
-}
-
-// Viewer events
-function setupViewerEvents() {
-  ['sag-panel', 'ax-panel'].forEach(panelId => {
-    const panel = document.getElementById(panelId);
-    const isSag = panelId === 'sag-panel';
-
-    // Scroll = change slice
-    panel.addEventListener('wheel', e => {
-      if (!currentCase || !caseData[currentCase]) return;
-      e.preventDefault();
-      if (e.ctrlKey) {
-        // Zoom
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        zoom = Math.max(0.5, Math.min(5, zoom + delta));
-        applyTransform('sag'); applyTransform('ax');
-        return;
-      }
-      const dir = e.deltaY > 0 ? 1 : -1;
-      if (isSag) {
-        if (showingAnnotated) return;
-        sagIdx += dir;
-        showSlice('sag');
-      } else {
-        axIdx += dir;
-        showSlice('ax');
-      }
-    }, { passive: false });
-
-    // Middle button drag = W/L
-    panel.addEventListener('mousedown', e => {
-      if (e.button === 1) {
-        e.preventDefault();
-        wlActive = true;
-        wlStartX = e.clientX;
-        wlStartY = e.clientY;
-      } else if (e.button === 2) {
-        e.preventDefault();
-        panActive = true;
-        panStartX = e.clientX;
-        panStartY = e.clientY;
-        panBaseX = panX;
-        panBaseY = panY;
-      }
-    });
-
-    panel.addEventListener('contextmenu', e => e.preventDefault());
-  });
-
-  document.addEventListener('mousemove', e => {
-    if (wlActive) {
-      const dx = e.clientX - wlStartX;
-      const dy = e.clientY - wlStartY;
-      brightness = Math.max(20, Math.min(300, 100 + dy * -0.5));
-      contrast = Math.max(20, Math.min(300, 100 + dx * 0.5));
-      applyTransform('sag'); applyTransform('ax');
-    }
-    if (panActive) {
-      panX = panBaseX + (e.clientX - panStartX) / zoom;
-      panY = panBaseY + (e.clientY - panStartY) / zoom;
-      applyTransform('sag'); applyTransform('ax');
-    }
-  });
-
-  document.addEventListener('mouseup', e => {
-    if (e.button === 1) wlActive = false;
-    if (e.button === 2) panActive = false;
-  });
-
-  // Reset on double click
-  document.getElementById('sag-panel').addEventListener('dblclick', () => {
-    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
-    applyTransform('sag'); applyTransform('ax');
-  });
-  document.getElementById('ax-panel').addEventListener('dblclick', () => {
-    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
-    applyTransform('sag'); applyTransform('ax');
-  });
-}
-
-// PFI Overlay
-function toggleOverlay() {
-  document.getElementById('pfi-overlay').classList.toggle('collapsed');
-}
-
-async function runAnalysis() {
-  const btn = document.getElementById('analyze-btn');
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  // Simulated delay
-  await new Promise(r => setTimeout(r, 1500 + Math.random() * 500));
-
-  const data = caseData[currentCase];
-  const r = data.results;
-  showResults(r);
-
-  // Auto-show landmarks after analysis
-  if (!showingAnnotated) {
-    showingAnnotated = true;
-    sagIdx = data.results.best_slice_index;
-    showSlice('sag');
-  }
-
-  btn.classList.remove('loading');
-  btn.querySelector('.btn-text').textContent = 'Re-analyze';
-  btn.disabled = false;
-}
-
-function catClass(cat) {
-  if (cat === 'Normal') return 'cat-normal';
-  if (cat.includes('Borderline')) return 'cat-borderline';
-  return 'cat-abnormal';
-}
-
-function confColor(conf) {
-  if (conf === 'High') return 'var(--green)';
-  if (conf === 'Moderate') return 'var(--yellow)';
-  return 'var(--red)';
-}
-
-function conclusionColor(c) {
-  if (c === 'Normal') return 'var(--green)';
-  if (c === 'Inconclusive') return 'var(--yellow)';
-  return 'var(--red)';
-}
-
-function showResults(r) {
-  const panel = document.getElementById('results-panel');
-  panel.innerHTML = `
-    <div class="result-row">
-      <span class="result-label">Insall-Salvati</span>
-      <span><span class="result-value">${r.is_value.toFixed(3)}</span> <span class="result-cat ${catClass(r.is_5cat)}">${r.is_5cat}</span></span>
-    </div>
-    <div class="result-row">
-      <span class="result-label">Caton-Deschamps</span>
-      <span><span class="result-value">${r.cdi_value.toFixed(3)}</span> <span class="result-cat ${catClass(r.cdi_5cat)}">${r.cdi_5cat}</span></span>
-    </div>
-    <div class="result-row">
-      <span class="result-label">Patellar Tracking</span>
-      <span><span class="result-value">${(r.pti_value||0).toFixed(3)}</span> <span class="result-cat ${catClass(r.pti_3cat||'Normal')}">${r.pti_3cat||'—'}</span></span>
-    </div>
-    <div class="divider"></div>
-    <div class="conclusion-text" style="color:${conclusionColor(r.conclusion)}">${r.conclusion}</div>
-    <div class="confidence-row">
-      <span class="confidence-dot" style="background:${confColor(r.confidence)}"></span>
-      <span class="confidence-label">Confidence: <strong style="color:${confColor(r.confidence)}">${r.confidence}</strong></span>
-    </div>
-    <div class="note-text">${r.note}</div>
-    <div class="action-row">
-      <button class="action-btn active" id="landmark-btn" onclick="toggleLandmarks()">Hide Landmarks</button>
-      <button class="action-btn" id="copy-btn" onclick="copyReport()">Copy Report</button>
-    </div>
-  `;
-  panel.style.display = 'block';
-}
-
-function toggleLandmarks() {
-  showingAnnotated = !showingAnnotated;
-  const btn = document.getElementById('landmark-btn');
-  btn.classList.toggle('active', showingAnnotated);
-  btn.textContent = showingAnnotated ? 'Hide Landmarks' : 'Show Landmarks';
-  if (showingAnnotated) {
-    sagIdx = caseData[currentCase].results.best_slice_index;
-  }
-  showSlice('sag');
+function closeModal(e) {
+  if (e && e.target.id !== 'modal-bg' && e.type === 'click') return;
+  document.getElementById('modal-bg').classList.remove('show');
 }
 
 function copyReport() {
-  const r = caseData[currentCase].results;
-  const text = `PATELLOFEMORAL INDICES (automated):
-Insall-Salvati index: ${r.is_value.toFixed(3)} (${r.is_5cat})
-Caton-Deschamps index: ${r.cdi_value.toFixed(3)} (${r.cdi_5cat})
-Patellar Tracking Index: ${(r.pti_value||0).toFixed(3)} (${r.pti_3cat||'—'})
-
-Patellar height: ${r.conclusion}
-Confidence: ${r.confidence}
-Note: ${r.note}`;
-
+  const text = document.getElementById('report-text').textContent;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copy-btn');
     btn.classList.add('copied');
     btn.textContent = 'Copied!';
     setTimeout(() => {
       btn.classList.remove('copied');
-      btn.textContent = 'Copy Report';
+      btn.textContent = 'Copy to clipboard';
     }, 1500);
   });
 }
 
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
-  if (!currentCase || !caseData[currentCase]) return;
-  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-    if (!showingAnnotated) { sagIdx--; showSlice('sag'); }
-  } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-    if (!showingAnnotated) { sagIdx++; showSlice('sag'); }
-  } else if (e.key === 'r' || e.key === 'R') {
-    brightness = 100; contrast = 100; zoom = 1; panX = 0; panY = 0;
-    applyTransform('sag'); applyTransform('ax');
-  } else if (e.key >= '1' && e.key <= '5') {
-    const idx = parseInt(e.key) - 1;
-    if (manifest && manifest.cases[idx]) {
-      selectCase(manifest.cases[idx].case_name);
-    }
-  }
+  if (e.key === 'Escape') closeModal();
 });
 
 init();
