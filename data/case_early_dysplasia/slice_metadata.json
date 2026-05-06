@@ -2,15 +2,15 @@
   "case_label": "case_early_dysplasia",
   "study_id": "1FB_1018699739____1FB,_5723718857",
   "sag": {
-    "n_slices": 30,
-    "slice_thickness_mm": 3.2,
+    "n_slices": 38,
+    "slice_thickness_mm": 2.0,
     "pixel_spacing_mm": [
       0.4375,
       0.4375
     ],
     "original_rows": 320,
     "original_cols": 320,
-    "series_description": "SAG T2 FS",
+    "series_description": "SAG PD",
     "render_size": 512
   },
   "ax": {
