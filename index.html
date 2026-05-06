@@ -422,15 +422,20 @@ function drawSagOverlay() {
   drawTextLabel(svg, lm['is_patella_top'], 8, -8, `IS = ${fmt(ind.IS?.value, 3)} ${ind.IS?.category}`,
                  verdictHex(ind.IS?.category));
   // CDI line: cart_top → cart_bottom (cyan); projection cart_bottom to tibial_plateau (yellow)
+  // CDI's cart-edge landmarks are kept here for the CDI ratio computation context.
+  // The CANONICAL cart-edge display (per cart_edge_canonical_source: PTI_v2) is the
+  // PTI overlay below; CDI's CT/CB show as smaller secondary markers.
   drawLine(svg, lm['cd_cd_cartilage_top'], lm['cd_cd_cartilage_bottom'], 'var(--ovly-cyan)');
   drawLine(svg, lm['cd_cd_cartilage_bottom'], lm['cd_cd_tibial_plateau'], 'var(--ovly-yellow)');
-  drawDot(svg, lm['cd_cd_cartilage_top'], 'var(--ovly-cyan)');
-  drawDot(svg, lm['cd_cd_cartilage_bottom'], 'var(--ovly-cyan)');
+  drawDot(svg, lm['cd_cd_cartilage_top'], 'var(--ovly-cyan)', 2.5);  // smaller — secondary
+  drawDot(svg, lm['cd_cd_cartilage_bottom'], 'var(--ovly-cyan)', 2.5);  // smaller — secondary
   drawDot(svg, lm['cd_cd_tibial_plateau'], 'var(--ovly-yellow)');
   drawTextLabel(svg, lm['cd_cd_cartilage_bottom'], 8, 14, `CDI = ${fmt(ind.CDI?.value, 3)} ${ind.CDI?.category}`,
                  verdictHex(ind.CDI?.category));
-  // PTI: pc_top→pc_bot (cyan, patella cart), tc_top→tc_bot (yellow, overlap)
-  drawLine(svg, lm['pti_pti_pc_top'], lm['pti_pti_pc_bot'], 'var(--ovly-cyan)', 1.5, true);
+  // PTI: pc_top→pc_bot (cyan, patella cart, CANONICAL cart-edge), tc_top→tc_bot (yellow, overlap)
+  drawLine(svg, lm['pti_pti_pc_top'], lm['pti_pti_pc_bot'], 'var(--ovly-cyan)', 1.5);
+  drawDot(svg, lm['pti_pti_pc_top'], 'var(--ovly-cyan)');  // canonical cart-top
+  drawDot(svg, lm['pti_pti_pc_bot'], 'var(--ovly-cyan)');  // canonical cart-bot
   drawLine(svg, lm['pti_pti_tc_top'], lm['pti_pti_tc_bot'], 'var(--ovly-yellow)', 1.5);
   drawDot(svg, lm['pti_pti_tc_top'], 'var(--ovly-yellow)');
   drawDot(svg, lm['pti_pti_tc_bot'], 'var(--ovly-yellow)');

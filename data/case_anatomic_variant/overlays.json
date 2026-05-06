@@ -328,5 +328,6 @@
       ],
       "recommendation": "No PFI features identified. No specific imaging follow-up indicated. IS index inflated by anatomic variant; CDI + PTI better reflect functional patellar height."
     }
-  }
+  },
+  "cart_edge_canonical_source": "PTI_v2"
 }

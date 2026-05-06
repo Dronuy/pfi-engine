@@ -316,5 +316,6 @@
       "flags": [],
       "recommendation": "No PFI features identified. No specific imaging follow-up indicated."
     }
-  }
+  },
+  "cart_edge_canonical_source": "PTI_v2"
 }
